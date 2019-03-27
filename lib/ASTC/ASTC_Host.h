@@ -29,15 +29,11 @@
 #include "ASTC_Encode_Kernel.h"
 #include "ARM/astc_codec_internals.h"
 
-#define __constant const
-#define __kernel
-#define __global
-
 #include <cstdint>
 
 namespace ASTC_Encoder
 {
-bool init_ASTC(__global ASTC_Encode *ASTCEncode);
+bool init_ASTC(ASTC_Encode *ASTCEncode);
 
 extern uint16_t unorm16_to_sf16(uint16_t p);
 extern uint16_t lns_to_sf16(uint16_t p);
@@ -114,17 +110,14 @@ void initialize_image_cpu(astc_codec_image_cpu *img);
 void physical_to_symbolic_cpu(int xdim, int ydim, int zdim,
 	physical_compressed_block_cpu pb, symbolic_compressed_block_cpu *res);
 
-
 void write_imageblock_cpu(astc_codec_image_cpu *img, const imageblock_cpu *pb,
 	int xdim, int ydim, int zdim, int xpos, int ypos, int zpos,
 	swizzlepattern_cpu swz);
 
 void destroy_image_cpu(astc_codec_image_cpu *img);
 
-
 void fetch_imageblock_cpu(const astc_codec_image_cpu *img, imageblock_cpu *pb,
 	// position in texture.
-	int xpos, int ypos, int zpos,
-	__global ASTC_Encoder::ASTC_Encode *ASTCEncode);
+	int xpos, int ypos, int zpos, ASTC_Encoder::ASTC_Encode *ASTCEncode);
 
 #endif
