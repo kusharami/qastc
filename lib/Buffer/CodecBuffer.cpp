@@ -118,7 +118,8 @@ void CCodecBuffer::SetBlockDims(CMP_BYTE BlockWidth, CMP_BYTE BlockHeight)
 		m_dwPitch = m_nColumns * m_nBlockSize;
 		if (!m_bUserAllocedData)
 		{
-			realloc(m_pData, GetDataSize());
+			m_pData =
+				reinterpret_cast<CMP_BYTE *>(realloc(m_pData, GetDataSize()));
 		}
 	}
 }
