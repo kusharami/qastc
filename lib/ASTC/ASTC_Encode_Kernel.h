@@ -20,12 +20,6 @@
 
 #include "ARM/astc_codec_internals.h"
 
-// when running kernel as cpu c++
-#define __kernel
-#define __global
-#define __constant const
-#define __local const
-
 struct Vec4uc
 {
 	Vec4uc() {}
@@ -113,8 +107,8 @@ namespace ASTC_Encoder
 #define ANGULAR_STEPS 88
 #define SINCOS_STEPS 64
 
-extern __constant float angular_steppings[ANGULAR_STEPS];
-extern __constant int steps_of_level[];
+extern const float angular_steppings[ANGULAR_STEPS];
+extern const int steps_of_level[];
 
 #define ENABLE_3_PARTITION_CODE
 #define ENABLE_4_PARTITION_CODE
@@ -152,10 +146,6 @@ extern __constant int steps_of_level[];
 #define FLOAT_34 1e34f
 #define FLOAT_35 1e35f
 #define FLOAT_38 1e38f
-
-#define __constant const
-#define __kernel
-#define __global
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338
@@ -239,7 +229,7 @@ typedef struct
 	float4 bis;
 } processed_line4;
 
-extern __constant float dummy_percentile_table_3d[2048];
+extern const float dummy_percentile_table_3d[2048];
 
 typedef union if32_
 {
@@ -266,12 +256,12 @@ and floating-point values. For each quantized weight, a previous-value and a nex
 typedef int quantization_mode_table_t[128];
 typedef float sincos_table_t[ANGULAR_STEPS];
 
-extern __constant quantization_mode_table_t *quantization_mode_table; //[17]
-extern __constant sincos_table_t *sin_table;
-extern __constant sincos_table_t *cos_table;
-extern __constant float *stepsizes; //[ANGULAR_STEPS];
-extern __constant float *stepsizes_sqr; //[ANGULAR_STEPS];
-extern __constant int *max_angular_steps_needed_for_quant_level; //[13]
+extern const quantization_mode_table_t *quantization_mode_table; //[17]
+extern const sincos_table_t *sin_table;
+extern const sincos_table_t *cos_table;
+extern const float *stepsizes; //[ANGULAR_STEPS];
+extern const float *stepsizes_sqr; //[ANGULAR_STEPS];
+extern const int *max_angular_steps_needed_for_quant_level; //[13]
 
 typedef struct
 {
@@ -303,23 +293,23 @@ typedef struct
 	error_weighting_params m_ewp;
 	const block_size_descriptor *bsd;
 	float m_Quality;
-	const partition_info * const *partition_tables;
+	const partition_info *const *partition_tables;
 } ASTC_Encode;
 
 extern void imageblock_initialize_work_from_orig(
 	imageblock *pb, int pixelcount);
 extern int compute_ise_bitcount(int items, quantization_method quant);
 
-void update_imageblock_flags(imageblock *pb, __global ASTC_Encode *ASTC_Encode);
+void update_imageblock_flags(imageblock *pb, ASTC_Encode *ASTC_Encode);
 
-extern void decompress_symbolic_block(symbolic_compressed_block *scb,
-	imageblock *blk, __global ASTC_Encode *ASTCEncode);
+extern void decompress_symbolic_block(
+	symbolic_compressed_block *scb, imageblock *blk, ASTC_Encode *ASTCEncode);
 
-extern float compress_symbolic_block(imageblock *blk,
-	symbolic_compressed_block *scb, __global ASTC_Encode *ASTCEncode);
+extern float compress_symbolic_block(
+	imageblock *blk, symbolic_compressed_block *scb, ASTC_Encode *ASTCEncode);
 
 extern physical_compressed_block symbolic_to_physical(
-	symbolic_compressed_block *sc, __global ASTC_Encode *ASTCEncode);
+	symbolic_compressed_block *sc, ASTC_Encode *ASTCEncode);
 
 } // ASTC_ENCODE namespace
 
