@@ -30,12 +30,12 @@
 #include <algorithm>
 
 using namespace std;
- 
+
 namespace ASTC_Encoder
 {
 
 
-static __constant  uint8_t color_quantization_tables[21][256] = {
+static const  uint8_t color_quantization_tables[21][256] = {
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -416,7 +416,7 @@ static __constant  uint8_t color_quantization_tables[21][256] = {
     },
 };
 
-static __constant  uint8_t color_unquantization_tables[21][256] = {
+static const  uint8_t color_unquantization_tables[21][256] = {
     {
         0, 255,
     },
@@ -544,7 +544,7 @@ static __constant  uint8_t color_unquantization_tables[21][256] = {
 };
 
 
-__constant float angular_steppings[ANGULAR_STEPS] = {
+const float angular_steppings[ANGULAR_STEPS] = {
     1.0, 1.125,
     1.25, 1.375,
     1.5, 1.625,
@@ -588,7 +588,7 @@ __constant float angular_steppings[ANGULAR_STEPS] = {
 };
 //=============================================
 
-typedef struct 
+typedef struct
 {
     float2 v[2];
 } mat2t;
@@ -598,12 +598,12 @@ typedef struct
     float4 v[4];
 } mat4t;
 
-__constant quantization_and_transfer_table quant_and_xfer_tables[12] = {
+const quantization_and_transfer_table quant_and_xfer_tables[12] = {
     // quantization method 0, range 0..1
     {
             QUANT_2,
             { 0, 64, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-            { 0.000000, 1.000000, 
+            { 0.000000, 1.000000,
               0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
               0.0,0,0.0,0,0.0,0.0,0,0.0,0.0,0,0.0,0.0,0.0,0.0 },
             { 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -1003,7 +1003,7 @@ __constant quantization_and_transfer_table quant_and_xfer_tables[12] = {
         QUANT_8,
         { 0, 9, 18, 27, 37, 46, 55, 64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
         {
-            0.000000, 0.140625, 0.281250, 0.421875, 0.578125, 0.718750, 0.859375, 1.000000, 
+            0.000000, 0.140625, 0.281250, 0.421875, 0.578125, 0.718750, 0.859375, 1.000000,
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
             { 0, 0, 1, 2, 3, 4, 5, 6, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
             { 1, 2, 3, 4, 5, 6, 7, 7, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -1583,7 +1583,7 @@ __constant quantization_and_transfer_table quant_and_xfer_tables[12] = {
 
 // packed trit-value for every unpacked trit-quintuplet
 // indexed by [high][][][][low]
-static __constant uint8_t integer_of_trits[3][3][3][3][3] = {
+static const uint8_t integer_of_trits[3][3][3][3][3] = {
     {
         {
             {
@@ -1747,7 +1747,7 @@ static __constant uint8_t integer_of_trits[3][3][3][3][3] = {
 
 // packed quint-value for every unpacked quint-triplet
 // indexed by [high][middle][low]
-static __constant uint8_t integer_of_quints[5][5][5] = {
+static const uint8_t integer_of_quints[5][5][5] = {
     {
         { 0, 1, 2, 3, 4, },
         { 8, 9, 10, 11, 12, },
@@ -1786,7 +1786,7 @@ static __constant uint8_t integer_of_quints[5][5][5] = {
 };
 
 
-static __constant float baseline_quant_error[21] = {
+static const float baseline_quant_error[21] = {
     (65536.0f * 65536.0f / 18.0f),              // 2 values, 1 step
     (65536.0f * 65536.0f / 18.0f) / (2 * 2),    // 3 values, 2 steps
     (65536.0f * 65536.0f / 18.0f) / (3 * 3),    // 4 values, 3 steps
@@ -1810,10 +1810,10 @@ static __constant float baseline_quant_error[21] = {
     (65536.0f * 65536.0f / 18.0f) / (255 * 255)
 };
 
-static __constant float rgbo_error_scales[6] = { 4.0f, 4.0f, 16.0f, 64.0f, 256.0f, 1024.0f };
-static __constant float rgb_error_scales[9] = { 64.0f, 64.0f, 16.0f, 16.0f, 4.0f, 4.0f, 1.0f, 1.0f, 384.0f };
-static __constant int shamts[6] = { 1, 1, 2, 3, 4, 5 };
-static __constant int dbits_tab[8] = { 7, 6, 7, 6, 5, 6, 5, 6 };
+static const float rgbo_error_scales[6] = { 4.0f, 4.0f, 16.0f, 64.0f, 256.0f, 1024.0f };
+static const float rgb_error_scales[9] = { 64.0f, 64.0f, 16.0f, 16.0f, 4.0f, 4.0f, 1.0f, 1.0f, 384.0f };
+static const int shamts[6] = { 1, 1, 2, 3, 4, 5 };
+static const int dbits_tab[8] = { 7, 6, 7, 6, 5, 6, 5, 6 };
 
 /*
 This table contains, for every FP16 sign/exponent value combination,
@@ -1825,7 +1825,7 @@ with just 1 table lookup, 2 shifts and 1 add.
 
 
 // weight + 12
-static __constant  unsigned int idxtab[256] = {
+static const  unsigned int idxtab[256] = {
 
     12, 13, 14, 15, 16, 17, 18, 19,
     20, 21, 22, 23, 24, 25, 26, 27,
@@ -1862,16 +1862,16 @@ static __constant  unsigned int idxtab[256] = {
     4, 5, 6, 7, 8, 9, 10, 11
 };
 
-__constant float dummy_percentile_table_3d[2048] = { 0 };
-static __constant  uint8_t cbytes1[8] = { 0xFC, 0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-static __constant  uint8_t cbytes2[8] = { 0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+const float dummy_percentile_table_3d[2048] = { 0 };
+static const  uint8_t cbytes1[8] = { 0xFC, 0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static const  uint8_t cbytes2[8] = { 0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 // yes, the next-to-last entry is supposed to have the value 33. This because under
 // ASTC, the the 32-weight mode leaves a double-sized hole in the middle of the
 // weight space, so we are better off matching 33 weights than 32.
-__constant int steps_of_level[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 33, 36 };
+const int steps_of_level[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 33, 36 };
 
-static __constant  float quantization_step_table[12] = {
+static const  float quantization_step_table[12] = {
     1.0f / 1.0f,
     1.0f / 2.0f,
     1.0f / 3.0f,
@@ -1887,7 +1887,7 @@ static __constant  float quantization_step_table[12] = {
 };
 
 // number of bits in the various fields in the various modes
-static __constant int mode_bits[8][4] = {
+static const int mode_bits[8][4] = {
     { 9, 7, 6, 7 },
     { 9, 8, 6, 6 },
     { 10, 6, 7, 7 },
@@ -1900,7 +1900,7 @@ static __constant int mode_bits[8][4] = {
 
 // cutoffs to use for the computed values of a,b,c,d, assuming the
 // range 0..65535 are LNS values corresponding to fp16.
-static __constant  float mode_cutoffs[8][4] = {
+static const  float mode_cutoffs[8][4] = {
     { 16384, 8192, 8192, 8 },    // mode 0: 9,7,6,7
     { 32768, 8192, 4096, 8 },    // mode 1: 9,8,6,6
     { 4096, 8192, 4096, 4 },    // mode 2: 10,6,7,7
@@ -1911,7 +1911,7 @@ static __constant  float mode_cutoffs[8][4] = {
     { 1024, 2048, 512, 1 },    // mode 7: 12,6,7,6
 };
 
-static __constant  float mode_scales[8] = {
+static const  float mode_scales[8] = {
     1.0f / 128.0f,
     1.0f / 128.0f,
     1.0f / 64.0f,
@@ -1923,7 +1923,7 @@ static __constant  float mode_scales[8] = {
 };
 
 // scaling factors when going from what was encoded in the mode to 16 bits.
-static __constant  float mode_rscales[8] = {
+static const  float mode_rscales[8] = {
     128.0f,
     128.0f,
     64.0f,
@@ -1934,9 +1934,9 @@ static __constant  float mode_rscales[8] = {
     16.0f
 };
 
-static __constant int testbits[3] = { 0xE0, 0xF0, 0xF8 };
+static const int testbits[3] = { 0xE0, 0xF0, 0xF8 };
 
-static __constant float mode_rscales2[5] = {
+static const float mode_rscales2[5] = {
     32.0f,
     32.0f,
     64.0f,
@@ -1944,7 +1944,7 @@ static __constant float mode_rscales2[5] = {
     256.0f,
 };
 
-static __constant int mode_bits2[5][3] = {
+static const int mode_bits2[5][3] = {
     { 11, 5, 7 },
     { 11, 6, 5 },
     { 10, 5, 8 },
@@ -1952,7 +1952,7 @@ static __constant int mode_bits2[5][3] = {
     { 8, 7, 6 }
 };
 
-static __constant float mode_cutoffs2[5][2] = {
+static const float mode_cutoffs2[5][2] = {
     { 1024, 4096 },
     { 2048, 1024 },
     { 2048, 16384 },
@@ -1960,7 +1960,7 @@ static __constant float mode_cutoffs2[5][2] = {
     { 32768, 16384 }
 };
 
-static __constant float mode_scales2[5] = {
+static const float mode_scales2[5] = {
     1.0f / 32.0f,
     1.0f / 32.0f,
     1.0f / 64.0f,
@@ -1969,7 +1969,7 @@ static __constant float mode_scales2[5] = {
 };
 
 // more numbers from random.org
-static __constant float cluster_cutoffs[25] = {
+static const float cluster_cutoffs[25] = {
     0.952312f, 0.206893f, 0.835984f, 0.507813f, 0.466170f,
     0.872331f, 0.488028f, 0.866394f, 0.363093f, 0.467905f,
     0.812967f, 0.626220f, 0.932770f, 0.275454f, 0.832020f,
@@ -1977,28 +1977,24 @@ static __constant float cluster_cutoffs[25] = {
     0.566812f, 0.347661f, 0.731960f, 0.156391f, 0.297786f
 };
 
-static __constant int bits_to_write5[5] = { 2, 2, 1, 2, 1 };
-static __constant int block_shift5[5] = { 0, 2, 4, 5, 7 };
-static __constant int next_lcounter5[5] = { 1, 2, 3, 4, 0 };
-static __constant int hcounter_incr5[5] = { 0, 0, 0, 0, 1 };
+static const int bits_to_write5[5] = { 2, 2, 1, 2, 1 };
+static const int block_shift5[5] = { 0, 2, 4, 5, 7 };
+static const int next_lcounter5[5] = { 1, 2, 3, 4, 0 };
+static const int hcounter_incr5[5] = { 0, 0, 0, 0, 1 };
 
-static __constant int bits_to_write3[3] = { 3, 2, 2 };
-static __constant int block_shift3[3] = { 0, 3, 5 };
-static __constant int next_lcounter3[3] = { 1, 2, 0 };
-static __constant int hcounter_incr3[3] = { 0, 0, 1 };
-
-
-__constant quantization_mode_table_t *quantization_mode_table = NULL;
-__constant sincos_table_t *sin_table = NULL;
-__constant sincos_table_t *cos_table = NULL;
-__constant float *stepsizes = NULL;
-__constant float *stepsizes_sqr = NULL;
-__constant int *max_angular_steps_needed_for_quant_level = NULL;
+static const int bits_to_write3[3] = { 3, 2, 2 };
+static const int block_shift3[3] = { 0, 3, 5 };
+static const int next_lcounter3[3] = { 1, 2, 0 };
+static const int hcounter_incr3[3] = { 0, 0, 1 };
 
 
-// This is tempory and will be removed 
-// global2 is used to identify the ASTC_Encode arrays that need to be removed or reduced in size from OpenCL call stack!
-#define __global2           __global
+const quantization_mode_table_t *quantization_mode_table = NULL;
+const sincos_table_t *sin_table = NULL;
+const sincos_table_t *cos_table = NULL;
+const float *stepsizes = NULL;
+const float *stepsizes_sqr = NULL;
+const int *max_angular_steps_needed_for_quant_level = NULL;
+
 
 #define DEBUG(x)       // printf("%s\n",x);
 
@@ -2067,13 +2063,13 @@ static float float_to_lns(float p)
          // We count underflow if the input value is smaller than 2^-26.
          return 0;
     }
-     
+
     if (fabs(p) >= 65536.0f)
     {
          // overflow, return a +INF value
          return 65535;
     }
-     
+
     int expo;
     float normfrac = (float)frexp(p, &expo);
     float p1;
@@ -2088,14 +2084,14 @@ static float float_to_lns(float p)
          expo += 14;
          p1 = (normfrac - 0.5f) * 4096.0f;
      }
-     
+
      if (p1 < 384.0f)
          p1 *= 4.0f / 3.0f;
      else if (p1 <= 1408.0f)
          p1 += 128.0f;
      else
          p1 = (p1 + 512.0f) * (4.0f / 5.0f);
-     
+
      p1 += expo * 2048.0f;
     return p1 + 1.0f;
 }
@@ -2196,7 +2192,7 @@ void imageblock_initialize_work_from_orig(imageblock * pb, int pixelcount)
              wptr[1] = fptr[1] * 65535.0f;
              wptr[2] = fptr[2] * 65535.0f;
         }
-         
+
         if (pb->alpha_lns[i])
         {
              wptr[3] = float_to_lns(fptr[3]);
@@ -2212,13 +2208,13 @@ void imageblock_initialize_work_from_orig(imageblock * pb, int pixelcount)
     imageblock_initialize_deriv_from_work_and_orig(pb, pixelcount);
 }
 
-//========================================================================= 
+//=========================================================================
 // For an imageblock, update its flags.
 //
 // The updating is done based on work_data, not orig_data.
 //=========================================================================
 
-void update_imageblock_flags(imageblock * pb, __global ASTC_Encode *ASTC_Encode)
+void update_imageblock_flags(imageblock * pb,  ASTC_Encode *ASTC_Encode)
 {
     float red_min = FLOAT_38, red_max = -FLOAT_38;
     float green_min = FLOAT_38, green_max = -FLOAT_38;
@@ -2269,17 +2265,6 @@ void update_imageblock_flags(imageblock * pb, __global ASTC_Encode *ASTC_Encode)
     pb->grayscale = grayscale;
 }
 
-static uint32_t rtne_shift32(uint32_t inp, uint32_t shamt)
-{
-    uint32_t vl1 = (uint32_t)(1) << shamt;
-    uint32_t inp2 = inp + (vl1 >> 1);    /* added 0.5 ulp */
-    uint32_t msk = (inp | (uint32_t)(1)) & vl1;    /* nonzero if odd. '| 1' forces it to 1 if the shamt is 0. */
-    msk--;                        /* negative if even, nonnegative if odd. */
-    inp2 -= (msk >> 31);        /* subtract epsilon before shift if even. */
-    inp2 >>= shamt;
-    return inp2;
-}
-
 uint32_t rtna_shift32(uint32_t inp, uint32_t shamt)
 {
     uint32_t vl1 = ((uint32_t)(1) << shamt) >> 1;
@@ -2302,7 +2287,7 @@ static float prepare_error_weight_block(
     imageblock * blk,
     error_weight_block * ewb,
     error_weight_block_orig * ewbo,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("prepare_error_weight_block");
 
@@ -2326,11 +2311,11 @@ static float prepare_error_weight_block(
            for (y = 0; y < ASTCEncode->m_ydim; y++)
                for (x = 0; x < ASTCEncode->m_xdim; x++, idx++)
                {
-                   if (blk->xpos + int(x) >= blk->xsize 
-                    || blk->ypos + int(y) >= blk->ysize 
-#ifdef ENABLE_3D_SUPPORT                       
+                   if (blk->xpos + int(x) >= blk->xsize
+                    || blk->ypos + int(y) >= blk->ysize
+#ifdef ENABLE_3D_SUPPORT
                     || blk->zpos + int(z) >= blk->zsize
-#endif                       
+#endif
                        )
                    {
                        float4 weights = float4(FLOAT_n11, FLOAT_n11, FLOAT_n11, FLOAT_n11);
@@ -2338,19 +2323,19 @@ static float prepare_error_weight_block(
                        ewb->contains_zeroweight_texels = 1;
                        continue;
                    }
-                   
-                   float4 error_weight = { 
+
+                   float4 error_weight = {
                         ASTCEncode->m_ewp.rgb_base_weight,
                         ASTCEncode->m_ewp.rgb_base_weight,
                         ASTCEncode->m_ewp.rgb_base_weight,
-                        ASTCEncode->m_ewp.alpha_base_weight 
+                        ASTCEncode->m_ewp.alpha_base_weight
                    };
-    
+
                     if (any_mean_stdev_weight)
                     {
                         // napatel
                         // <=== This needs proper sizes ===> made local and should be set to image dimensions!!
-                        // float4 input_averages[4][4][4];    
+                        // float4 input_averages[4][4][4];
                         //--------------------------------------
 
                         float4 avg = { 0.0f, 0.0f, 0.0f, 0.0f }; //  input_averages[0][0][0]; // was [zpos][ypos][xpos] need to use correct value
@@ -2362,14 +2347,14 @@ static float prepare_error_weight_block(
                             avg.z = 6e-5f;
                         if (avg.w < 6e-5f)
                             avg.w = 6e-5f;
-                        /* 
+                        /*
                            printf("avg: %f %f %f %f\n", avg.x, avg.y, avg.z, avg.w ); */
                         avg = avg * avg;
 
                         //# Check this sections of code!
                         // napatel
                         // <=== This needs proper sizes ===> made local and should be set to image dimensions!!
-                        // float4 input_variances[4][4][4];    
+                        // float4 input_variances[4][4][4];
 
                         //--------------------------------------
                         float4 variance = { 0.0f, 0.0f, 0.0f, 0.0f }; // input_variances[0][0][0]; // was [zpos][ypos][xpos] need to use correct value
@@ -2516,11 +2501,11 @@ static float prepare_error_weight_block(
 }
 
 static void compute_partition_error_color_weightings(
-    error_weight_block * ewb, 
-    __global __constant partition_info * pi,
-    float4 error_weightings[4], 
+    error_weight_block * ewb,
+     const partition_info * pi,
+    float4 error_weightings[4],
     float4 color_scalefactors[4],
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
   DEBUG("compute_partition_error_color_weightings");
 
@@ -2549,28 +2534,28 @@ static void compute_partition_error_color_weightings(
 }
 
 static void compute_averages_and_directions_rgba(
-    __global __constant partition_info * pt,
+     const partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     float4 * color_scalefactors,
-    float4 * averages, 
-    float4 * directions_rgba, 
-    float3 * directions_gba, 
-    float3 * directions_rba, 
-    float3 * directions_rga, 
+    float4 * averages,
+    float4 * directions_rgba,
+    float3 * directions_gba,
+    float3 * directions_rba,
+    float3 * directions_rga,
     float3 * directions_rgb)
 {
     int i;
     int partition_count = pt->partition_count;
     int partition;
-    
+
     for (partition = 0; partition < partition_count; partition++)
     {
         int texelcount = pt->texels_per_partition[partition];
 
         float4 base_sum = {0.0f, 0.0f, 0.0f, 0.0f };
         float partition_weight = 0.0f;
-    
+
         for (i = 0; i < texelcount; i++)
         {
             int iwt = pt->texels_of_partition[partition][i];
@@ -2581,19 +2566,19 @@ static void compute_averages_and_directions_rgba(
                                   blk->work_data[4 * iwt + 3]};
             texel_datum =  texel_datum * weight;
             partition_weight += weight;
-    
+
             base_sum = base_sum + texel_datum;
         }
-    
+
         float4 average = base_sum * 1.0f / MAX(partition_weight, FLOAT_n7);
         averages[partition] = average * color_scalefactors[partition];
-    
-    
+
+
         float4 sum_xp = {0.0f, 0.0f, 0.0f, 0.0f};
         float4 sum_yp = {0.0f, 0.0f, 0.0f, 0.0f};
         float4 sum_zp = {0.0f, 0.0f, 0.0f, 0.0f};
         float4 sum_wp = {0.0f, 0.0f, 0.0f, 0.0f};
-    
+
         for (i = 0; i < texelcount; i++)
         {
             int iwt = pt->texels_of_partition[partition][i];
@@ -2603,7 +2588,7 @@ static void compute_averages_and_directions_rgba(
                                  blk->work_data[4 * iwt + 2],
                                  blk->work_data[4 * iwt + 3]};
             texel_datum = (texel_datum - average) * weight;
-    
+
             if (texel_datum.x > 0.0f)
                 sum_xp = sum_xp + texel_datum;
             if (texel_datum.y > 0.0f)
@@ -2613,12 +2598,12 @@ static void compute_averages_and_directions_rgba(
             if (texel_datum.w > 0.0f)
                 sum_wp = sum_wp + texel_datum;
         }
-    
+
         float prod_xp = dot(sum_xp, sum_xp);
         float prod_yp = dot(sum_yp, sum_yp);
         float prod_zp = dot(sum_zp, sum_zp);
         float prod_wp = dot(sum_wp, sum_wp);
-    
+
         float4 best_vector = sum_xp;
         float best_sum = prod_xp;
         if (prod_yp > best_sum)
@@ -2636,7 +2621,7 @@ static void compute_averages_and_directions_rgba(
             best_vector = sum_wp;
             best_sum = prod_wp;
         }
-    
+
         directions_rgba[partition] = best_vector;
         directions_rgb[partition] = best_vector.xyz;
         directions_rga[partition] = best_vector.xyw;
@@ -2646,11 +2631,11 @@ static void compute_averages_and_directions_rgba(
 }
 
 static void compute_endpoints_and_ideal_weights_rgba(
-    __global __constant partition_info * pt, 
-    imageblock * blk, 
-    error_weight_block * ewb, 
+     const partition_info * pt,
+    imageblock * blk,
+    error_weight_block * ewb,
     endpoints_and_weights * ei,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_endpoints_and_ideal_weights_rgba");
 
@@ -2775,14 +2760,14 @@ static void compute_endpoints_and_ideal_weights_rgba(
     }
 }
 
-static void compute_averages_and_directions_rgb(__global __constant partition_info * pt,
+static void compute_averages_and_directions_rgb( const partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
-    float4 * color_scalefactors, 
-    float3 * averages, 
-    float3 * directions_rgb, 
-    float2 * directions_rg, 
-    float2 * directions_rb, 
+    float4 * color_scalefactors,
+    float3 * averages,
+    float3 * directions_rgb,
+    float2 * directions_rg,
+    float2 * directions_rb,
     float2 * directions_gb)
 {
     int i;
@@ -2863,7 +2848,7 @@ static void compute_averages_and_directions_rgb(__global __constant partition_in
     }
 }
 
-static void compute_averages_and_directions_3_components(__global __constant partition_info * pt,
+static void compute_averages_and_directions_3_components( const partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     float3 * color_scalefactors, int component1, int component2, int component3, float3 * averages, float3 * directions)
@@ -2963,14 +2948,14 @@ static void compute_averages_and_directions_3_components(__global __constant par
 }
 
 static void compute_endpoints_and_ideal_weights_3_components(
-    __global __constant partition_info * pt,
-    imageblock * blk, 
+     const partition_info * pt,
+    imageblock * blk,
     error_weight_block * ewb,
-    endpoints_and_weights * ei, 
-    int component1, 
-    int component2, 
+    endpoints_and_weights * ei,
+    int component1,
+    int component2,
     int component3,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_endpoints_and_ideal_weights_3_components");
 
@@ -3246,11 +3231,11 @@ static int imageblock_uses_alpha1(imageblock * blk)
 }
 
 static void compute_endpoints_and_ideal_weights_1_plane(
-    __global __constant partition_info * pt, 
-    imageblock * blk, 
-    error_weight_block * ewb, 
+     const partition_info * pt,
+    imageblock * blk,
+    error_weight_block * ewb,
     endpoints_and_weights * ei,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_endpoints_and_ideal_weights_1_plane");
     int uses_alpha = imageblock_uses_alpha1(blk);
@@ -3267,10 +3252,10 @@ static void compute_endpoints_and_ideal_weights_1_plane(
 // function to compute angular sums; then, from the
 // angular sums, compute alignment factor and offset.
 static void compute_angular_offsets(
-    int samplecount, 
-    __global2 float *samples, 
-    __global2 float *sample_weights, 
-    int max_angular_steps, 
+    int samplecount,
+    float *samples,
+    float *sample_weights,
+    int max_angular_steps,
     float *offsets)
 {
 
@@ -3295,8 +3280,8 @@ static void compute_angular_offsets(
         p.f = (sample * (SINCOS_STEPS - 1.0f)) + 12582912.0f;
         unsigned int isample = p.u & 0x3F;
 
-        __constant float *sinptr = sin_table[isample];
-        __constant float *cosptr = cos_table[isample];
+        const float *sinptr = sin_table[isample];
+        const float *cosptr = cos_table[isample];
 
         for (j = 0; j < max_angular_steps; j++)
         {
@@ -3317,15 +3302,15 @@ static void compute_angular_offsets(
 }
 
 static void compute_lowest_and_highest_weight(
-    int samplecount, 
-    __global2 float *samples, 
-    __global2 float *sample_weights,
-    int max_angular_steps, 
+    int samplecount,
+    float *samples,
+    float *sample_weights,
+    int max_angular_steps,
     float *offsets,
-    int8_t * lowest_weight, 
+    int8_t * lowest_weight,
     int8_t * highest_weight,
-    float *error, 
-    float *cut_low_weight_error, 
+    float *error,
+    float *cut_low_weight_error,
     float *cut_high_weight_error)
 {
     int i;
@@ -3451,11 +3436,11 @@ static void compute_lowest_and_highest_weight(
 }
 
 static void compute_angular_endpoints_for_quantization_levels(
-    int samplecount, 
-    __global2 float *samples, 
-    __global2 float *sample_weights,
-     int max_quantization_level, 
-     float low_value[12], 
+    int samplecount,
+    float *samples,
+    float *sample_weights,
+     int max_quantization_level,
+     float low_value[12],
      float high_value[12])
 {
     DEBUG("compute_angular_endpoints_for_quantization_levels");
@@ -3483,7 +3468,7 @@ static void compute_angular_endpoints_for_quantization_levels(
     float cut_low_weight_error[ANGULAR_STEPS + 4];
     float cut_high_weight_error[ANGULAR_STEPS + 4];
 
-    compute_lowest_and_highest_weight(samplecount, samples, sample_weights, max_angular_steps, offsets, 
+    compute_lowest_and_highest_weight(samplecount, samples, sample_weights, max_angular_steps, offsets,
                                       lowest_weight, highest_weight, error, cut_low_weight_error, cut_high_weight_error);
 
     // for each quantization level, find the best error terms.
@@ -3582,34 +3567,22 @@ static void compute_angular_endpoints_for_quantization_levels(
 }
 
 static float compute_value_of_texel_flt(int texel_to_get,
-    __global __constant decimation_table *it, 
-    __global2 float *weights)
+     const decimation_table *it,
+     float *weights)
 {
     return
-        ( weights[it->texel_weights[texel_to_get][0]] * it->texel_weights_float[texel_to_get][0] 
-       +  weights[it->texel_weights[texel_to_get][1]] * it->texel_weights_float[texel_to_get][1]) 
-       + (weights[it->texel_weights[texel_to_get][2]] * it->texel_weights_float[texel_to_get][2] 
+        ( weights[it->texel_weights[texel_to_get][0]] * it->texel_weights_float[texel_to_get][0]
+       +  weights[it->texel_weights[texel_to_get][1]] * it->texel_weights_float[texel_to_get][1])
+       + (weights[it->texel_weights[texel_to_get][2]] * it->texel_weights_float[texel_to_get][2]
        +  weights[it->texel_weights[texel_to_get][3]] * it->texel_weights_float[texel_to_get][3]);
-}
-
-static float compute_value_of_texel_flt_localVar(
-    int texel_to_get, 
-    __global __constant decimation_table *it, 
-    float *weights)
-{
-    return
-              (weights[it->texel_weights[texel_to_get][0]] * it->texel_weights_float[texel_to_get][0]
-            +  weights[it->texel_weights[texel_to_get][1]] * it->texel_weights_float[texel_to_get][1])
-            + (weights[it->texel_weights[texel_to_get][2]] * it->texel_weights_float[texel_to_get][2]
-            +  weights[it->texel_weights[texel_to_get][3]] * it->texel_weights_float[texel_to_get][3]);
 }
 
 //inline
 static float compute_error_of_texel(
-    endpoints_and_weights * eai, 
-    int texel_to_get, 
-    __global __constant decimation_table * it, 
-    __global2 float *weights)
+    endpoints_and_weights * eai,
+    int texel_to_get,
+     const decimation_table * it,
+     float *weights)
 {
     float current_value = compute_value_of_texel_flt(texel_to_get, it, weights);
     float valuedif = current_value - eai->weights[texel_to_get];
@@ -3617,9 +3590,9 @@ static float compute_error_of_texel(
 }
 
 static float compute_error_of_weight_set(
-    endpoints_and_weights * eai, 
-    __global __constant decimation_table * it,
-    __global2 float *weights)
+    endpoints_and_weights * eai,
+     const decimation_table * it,
+     float *weights)
 {
     int i;
     int texel_count = it->num_texels;
@@ -3630,9 +3603,9 @@ static float compute_error_of_weight_set(
 }
 
 static void compute_two_error_changes_from_perturbing_weight_infill(
-    endpoints_and_weights * eai, 
-    __global __constant decimation_table * it,
-    float *infilled_weights, int weight_to_perturb, 
+    endpoints_and_weights * eai,
+     const decimation_table * it,
+    float *infilled_weights, int weight_to_perturb,
     float perturbation1, float perturbation2, float *res1, float *res2)
 {
     int num_weights = it->weight_num_texels[weight_to_perturb];
@@ -3657,10 +3630,10 @@ static void compute_two_error_changes_from_perturbing_weight_infill(
 }
 
 static void compute_ideal_weights_for_decimation_table(
-    endpoints_and_weights * eai, 
-    __global __constant decimation_table * it,
-    __global2 float *weight_set, 
-    __global2 float *weights)
+    endpoints_and_weights * eai,
+     const decimation_table * it,
+     float *weight_set,
+     float *weights)
 {
     DEBUG("compute_ideal_weights_for_decimation_table");
 
@@ -3726,7 +3699,7 @@ static void compute_ideal_weights_for_decimation_table(
             float error_change_up, error_change_down;
             compute_two_error_changes_from_perturbing_weight_infill(eai, it, infilled_weights, i, stepsize, -stepsize, &error_change_up, &error_change_down);
 
-            /* 
+            /*
                 assume that the error-change function behaves like a quadratic function in the interval examined,
                 with "error_change_up" and "error_change_down" defining the function at the endpoints
                 of the interval. Then, find the position where the function's derivative is zero.
@@ -3737,7 +3710,7 @@ static void compute_ideal_weights_for_decimation_table(
                 If fabs(b) > fabs(a), then f'(x)=0 will lie outside the interval altogether.
                 If a and b are both 0, then set step to 0;
                     otherwise, we end up computing 0/0, which produces a lethal NaN.
-                We can get an a=b=0 situation if an error weight is 0 in the wrong place. 
+                We can get an a=b=0 situation if an error weight is 0 in the wrong place.
             */
 
             float step;
@@ -3795,12 +3768,12 @@ static void compute_ideal_weights_for_decimation_table(
     return;
 }
 
-static void compute_angular_endpoints_1plane(float mode_cutoff, 
-                                      __global2 float *decimated_quantized_weights, 
-                                      __global2 float *decimated_weights,
-                                        float low_value[MAX_WEIGHT_MODES], 
+static void compute_angular_endpoints_1plane(float mode_cutoff,
+                                      float *decimated_quantized_weights,
+                                      float *decimated_weights,
+                                        float low_value[MAX_WEIGHT_MODES],
                                         float high_value[MAX_WEIGHT_MODES],
-                                      __global ASTC_Encode *ASTCEncode)
+                                       ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_angular_endpoints_1plane");
 
@@ -3816,7 +3789,7 @@ static void compute_angular_endpoints_1plane(float mode_cutoff,
         int permit_encode   = ASTCEncode->bsd->permit_encode[i];
         if (permit_encode == 0 || samplecount < 1 || quant_mode < 0 || percentile > mode_cutoff)
             continue;
-    
+
         compute_angular_endpoints_for_quantization_levels(samplecount,
                                                           decimated_quantized_weights + i * MAX_WEIGHTS_PER_BLOCK,
                                                           decimated_weights + i * MAX_WEIGHTS_PER_BLOCK, quant_mode,
@@ -3838,11 +3811,11 @@ static void compute_angular_endpoints_1plane(float mode_cutoff,
 
 static void compute_ideal_quantized_weights_for_decimation_table(
     endpoints_and_weights * eai,
-    __global __constant decimation_table * it,
-    float low_bound, float high_bound, 
-    __global2 float *weight_set_in,
-    __global2 float *weight_set_out, 
-    __global2 uint8_t * quantized_weight_set,
+     const decimation_table * it,
+    float low_bound, float high_bound,
+    float *weight_set_in,
+    float *weight_set_out,
+    uint8_t * quantized_weight_set,
     int quantization_level)
 {
     DEBUG("compute_ideal_quantized_weights_for_decimation_table");
@@ -3850,12 +3823,12 @@ static void compute_ideal_quantized_weights_for_decimation_table(
     int weight_count = it->num_weights;
     int texels_per_block = it->num_texels;
 
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[quantization_level]);
+    const quantization_and_transfer_table *qat = &(quant_and_xfer_tables[quantization_level]);
 
     // quantize the weight set using both the specified low/high bounds and the
     // standard 0..1 weight bounds.
 
-    /* 
+    /*
        WTF issue that we need to examine some time
     */
 
@@ -4087,7 +4060,7 @@ static float determinant(mat2t p)
     return v.x - v.y;
 }
 
-//static inline 
+//static inline
 static float mat_square_sum(mat2t p)
 {
     float a = p.v[0].x;
@@ -4113,24 +4086,24 @@ static void recompute_ideal_colors(int weight_quantization_mode,
     float4 * rgbs_vectors,              // used to return RGBS-vectors. (endpoint mode #6)
     float4 * rgbo_vectors,              // used to return RGBO-vectors. (endpoint mode #7)
     float2 * lum_vectors,               // used to return luminance-vectors.
-    __global2 uint8_t * weight_set8,     // the current set of weight values
-    __global2 uint8_t * plane2_weight_set8,    // 0 if plane 2 is not actually used.
+    uint8_t * weight_set8,     // the current set of weight values
+    uint8_t * plane2_weight_set8,    // 0 if plane 2 is not actually used.
     int plane2_color_component,    // color component for 2nd plane of weights; -1 if the 2nd plane of weights is not present
-    __global __constant partition_info * pi,
-    __global __constant decimation_table * it, 
+     const partition_info * pi,
+     const decimation_table * it,
     imageblock * blk,    // picture-block containing the actual data.
     error_weight_block * ewb,
-    __global ASTC_Encode *ASTCEncode
+     ASTC_Encode *ASTCEncode
     )
 {
      DEBUG("recompute_ideal_colors");
 
      int i, j;
-     __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_mode]);
- 
+     const quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_mode]);
+
      float weight_set[MAX_WEIGHTS_PER_BLOCK];
      float plane2_weight_set[MAX_WEIGHTS_PER_BLOCK];
- 
+
      for (i = 0; i < it->num_weights; i++)
      {
 
@@ -4158,7 +4131,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              plane2_weight_set[i] = qat->unquantized_value_flt[plane2_weight_set8[i]];
          }
      }
- 
+
      int partition_count = pi->partition_count;
 
 //#ifdef __OPENCL_VERSION__
@@ -4166,7 +4139,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
 //#endif
 //         printf("Low  <%g %g %g %g>\n", ep->endpt0[0].x, ep->endpt0[0].y, ep->endpt0[0].z, ep->endpt0[0].w);
 
- 
+
      mat2t pmat1_red[4], pmat1_green[4], pmat1_blue[4], pmat1_alpha[4], pmat1_lum[4], pmat1_scale[4];    // matrices for plane of weights 1
      mat2t pmat2_red[4], pmat2_green[4], pmat2_blue[4], pmat2_alpha[4];    // matrices for plane of weights 2
      float2 red_vec[4];
@@ -4176,7 +4149,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
      float2 lum_vec[4];
      float2 scale_vec[4];
      float2 zerof = {0.0f, 0.0f};
- 
+
      for (i = 0; i < partition_count; i++)
      {
          for (j = 0; j < 2; j++)
@@ -4199,8 +4172,8 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          lum_vec[i]   = zerof;
          scale_vec[i] = zerof;
      }
- 
- 
+
+
      float wmin1[4], wmax1[4];
      float wmin2[4], wmax2[4];
      float red_weight_sum[4];
@@ -4209,15 +4182,15 @@ static void recompute_ideal_colors(int weight_quantization_mode,
      float alpha_weight_sum[4];
      float lum_weight_sum[4];
      float scale_weight_sum[4];
- 
+
      float red_weight_weight_sum[4];
      float green_weight_weight_sum[4];
      float blue_weight_weight_sum[4];
- 
+
      float psum[4];                // sum of (weight * qweight^2) across (red,green,blue)
      float qsum[4];                // sum of (weight * qweight * texelval) across (red,green,blue)
- 
- 
+
+
      for (i = 0; i < partition_count; i++)
      {
          wmin1[i] = 1.0f;
@@ -4228,19 +4201,19 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          green_weight_sum[i] = FLOAT_n17;
          blue_weight_sum[i] = FLOAT_n17;
          alpha_weight_sum[i] = FLOAT_n17;
- 
+
          lum_weight_sum[i] = FLOAT_n17;
          scale_weight_sum[i] = FLOAT_n17;
- 
+
          red_weight_weight_sum[i] = FLOAT_n17;
          green_weight_weight_sum[i] = FLOAT_n17;
          blue_weight_weight_sum[i] = FLOAT_n17;
- 
+
          psum[i] = FLOAT_n17;
          qsum[i] = FLOAT_n17;
      }
- 
- 
+
+
      // for each partition, compute the direction that an RGB-scale color endpoint pair would have.
      float3 rgb_sum[4];
      float3 rgb_weight_sum[4];
@@ -4250,26 +4223,26 @@ static void recompute_ideal_colors(int weight_quantization_mode,
      float lum_min[4];
      float lum_max[4];
      float3 one17f = { FLOAT_n17, FLOAT_n17, FLOAT_n17 };
- 
+
      for (i = 0; i < partition_count; i++)
      {
          rgb_sum[i]        = one17f;
          rgb_weight_sum[i] = one17f;
      }
- 
- 
+
+
      for (i = 0; i < ASTCEncode->m_texels_per_block; i++)
      {
          float3 rgb = { blk->work_data[4 * i], blk->work_data[4 * i + 1], blk->work_data[4 * i + 2]};
          float3 rgb_weight = {ewb->texel_weight_r[i],
                               ewb->texel_weight_g[i],
                               ewb->texel_weight_b[i]};
- 
+
          int part = pi->partition_of_texel[i];
          rgb_sum[part] = rgb_sum[part] + (rgb * rgb_weight);
          rgb_weight_sum[part] = rgb_weight_sum[part] + rgb_weight;
      }
- 
+
      for (i = 0; i < partition_count; i++)
      {
          scale_directions[i] = normalize(rgb_sum[i] / rgb_weight_sum[i]);
@@ -4278,16 +4251,16 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          lum_max[i] = 0.0f;
          lum_min[i] = FLOAT_10;
      }
- 
+
      for (i = 0; i < ASTCEncode->m_texels_per_block; i++)
      {
          float r = blk->work_data[4 * i];
          float g = blk->work_data[4 * i + 1];
          float b = blk->work_data[4 * i + 2];
          float a = blk->work_data[4 * i + 3];
- 
+
          int part = pi->partition_of_texel[i];
-         float idx0 = it ? compute_value_of_texel_flt_localVar(i, it, weight_set) : weight_set[i];
+         float idx0 = it ? compute_value_of_texel_flt(i, it, weight_set) : weight_set[i];
 
 //#ifdef __OPENCL_VERSION__
 //         if ((get_global_id(0) == 0) && (get_global_id(1) == 0))
@@ -4296,20 +4269,20 @@ static void recompute_ideal_colors(int weight_quantization_mode,
 
 
          float om_idx0 = 1.0f - idx0;
- 
+
          if (idx0 > wmax1[part])
              wmax1[part] = idx0;
          if (idx0 < wmin1[part])
              wmin1[part] = idx0;
- 
+
          float red_weight = ewb->texel_weight_r[i];
          float green_weight = ewb->texel_weight_g[i];
          float blue_weight = ewb->texel_weight_b[i];
          float alpha_weight = ewb->texel_weight_a[i];
- 
+
          float lum_weight = (red_weight + green_weight + blue_weight);
          float scale_weight = lum_weight;
- 
+
          float lum = (r * red_weight + g * green_weight + b * blue_weight) / lum_weight;
          float3 scale_direction = scale_directions[part];
          float3 rgbf = {r, g, b};
@@ -4322,8 +4295,8 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              scale_min[part] = scale;
          if (scale > scale_max[part])
              scale_max[part] = scale;
- 
- 
+
+
          red_weight_sum[part] += red_weight;
          green_weight_sum[part] += green_weight;
          blue_weight_sum[part] += blue_weight;
@@ -4332,96 +4305,96 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          scale_weight_sum[part] += scale_weight;
 
 
- 
+
          pmat1_red[part].v[0].x += om_idx0 * om_idx0 * red_weight;
          pmat1_red[part].v[0].y += idx0 * om_idx0 * red_weight;
          pmat1_red[part].v[1].x += idx0 * om_idx0 * red_weight;
          pmat1_red[part].v[1].y += idx0 * idx0 * red_weight;
- 
+
          pmat1_green[part].v[0].x += om_idx0 * om_idx0 * green_weight;
          pmat1_green[part].v[0].y += idx0 * om_idx0 * green_weight;
          pmat1_green[part].v[1].x += idx0 * om_idx0 * green_weight;
          pmat1_green[part].v[1].y += idx0 * idx0 * green_weight;
- 
+
          pmat1_blue[part].v[0].x += om_idx0 * om_idx0 * blue_weight;
          pmat1_blue[part].v[0].y += idx0 * om_idx0 * blue_weight;
          pmat1_blue[part].v[1].x += idx0 * om_idx0 * blue_weight;
          pmat1_blue[part].v[1].y += idx0 * idx0 * blue_weight;
- 
+
          pmat1_alpha[part].v[0].x += om_idx0 * om_idx0 * alpha_weight;
          pmat1_alpha[part].v[0].y += idx0 * om_idx0 * alpha_weight;
          pmat1_alpha[part].v[1].x += idx0 * om_idx0 * alpha_weight;
          pmat1_alpha[part].v[1].y += idx0 * idx0 * alpha_weight;
- 
+
          pmat1_lum[part].v[0].x += om_idx0 * om_idx0 * lum_weight;
          pmat1_lum[part].v[0].y += idx0 * om_idx0 * lum_weight;
          pmat1_lum[part].v[1].x += idx0 * om_idx0 * lum_weight;
          pmat1_lum[part].v[1].y += idx0 * idx0 * lum_weight;
- 
+
          pmat1_scale[part].v[0].x += om_idx0 * om_idx0 * scale_weight;
          pmat1_scale[part].v[0].y += idx0 * om_idx0 * scale_weight;
          pmat1_scale[part].v[1].x += idx0 * om_idx0 * scale_weight;
          pmat1_scale[part].v[1].y += idx0 * idx0 * scale_weight;
- 
+
          float idx1 = 0.0f, om_idx1 = 0.0f;
          if (plane2_weight_set8)
          {
-             idx1 = it ? compute_value_of_texel_flt_localVar(i, it, plane2_weight_set) : plane2_weight_set[i];
+             idx1 = it ? compute_value_of_texel_flt(i, it, plane2_weight_set) : plane2_weight_set[i];
              om_idx1 = 1.0f - idx1;
              if (idx1 > wmax2[part])
                  wmax2[part] = idx1;
              if (idx1 < wmin2[part])
                  wmin2[part] = idx1;
- 
+
              pmat2_red[part].v[0].x += om_idx1 * om_idx1 * red_weight;
              pmat2_red[part].v[0].y += idx1 * om_idx1 * red_weight;
              pmat2_red[part].v[1].x += idx1 * om_idx1 * red_weight;
              pmat2_red[part].v[1].y += idx1 * idx1 * red_weight;
- 
+
              pmat2_green[part].v[0].x += om_idx1 * om_idx1 * green_weight;
              pmat2_green[part].v[0].y += idx1 * om_idx1 * green_weight;
              pmat2_green[part].v[1].x += idx1 * om_idx1 * green_weight;
              pmat2_green[part].v[1].y += idx1 * idx1 * green_weight;
- 
+
              pmat2_blue[part].v[0].x += om_idx1 * om_idx1 * blue_weight;
              pmat2_blue[part].v[0].y += idx1 * om_idx1 * blue_weight;
              pmat2_blue[part].v[1].x += idx1 * om_idx1 * blue_weight;
              pmat2_blue[part].v[1].y += idx1 * idx1 * blue_weight;
- 
+
              pmat2_alpha[part].v[0].x += om_idx1 * om_idx1 * alpha_weight;
              pmat2_alpha[part].v[0].y += idx1 * om_idx1 * alpha_weight;
              pmat2_alpha[part].v[1].x += idx1 * om_idx1 * alpha_weight;
              pmat2_alpha[part].v[1].y += idx1 * idx1 * alpha_weight;
          }
- 
+
          float red_idx = (plane2_color_component == 0) ? idx1 : idx0;
          float green_idx = (plane2_color_component == 1) ? idx1 : idx0;
          float blue_idx = (plane2_color_component == 2) ? idx1 : idx0;
          float alpha_idx = (plane2_color_component == 3) ? idx1 : idx0;
- 
- 
+
+
          red_vec[part].x += (red_weight * r) * (1.0f - red_idx);
          green_vec[part].x += (green_weight * g) * (1.0f - green_idx);
          blue_vec[part].x += (blue_weight * b) * (1.0f - blue_idx);
          alpha_vec[part].x += (alpha_weight * a) * (1.0f - alpha_idx);
          lum_vec[part].x += (lum_weight * lum) * om_idx0;
          scale_vec[part].x += (scale_weight * scale) * om_idx0;
- 
+
          red_vec[part].y += (red_weight * r) * red_idx;
          green_vec[part].y += (green_weight * g) * green_idx;
          blue_vec[part].y += (blue_weight * b) * blue_idx;
          alpha_vec[part].y += (alpha_weight * a) * alpha_idx;
          lum_vec[part].y += (lum_weight * lum) * idx0;
          scale_vec[part].y += (scale_weight * scale) * idx0;
- 
+
          red_weight_weight_sum[part] += red_weight * red_idx;
          green_weight_weight_sum[part] += green_weight * green_idx;
          blue_weight_weight_sum[part] += blue_weight * blue_idx;
- 
+
          psum[part] += red_weight * red_idx * red_idx + green_weight * green_idx * green_idx + blue_weight * blue_idx * blue_idx;
- 
+
      }
- 
+
      // calculations specific to mode #7, the HDR RGB-scale mode.
      float red_sum[4];
      float green_sum[4];
@@ -4433,7 +4406,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          blue_sum[i] = blue_vec[i].x + blue_vec[i].y;
          qsum[i] = red_vec[i].y + green_vec[i].y + blue_vec[i].y;
      }
- 
+
      // rgb+offset for HDR endpoint mode #7
      int rgbo_fail[4];
      for (i = 0; i < partition_count; i++)
@@ -4447,32 +4420,32 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          mod7_mat.v[1] = matv1f;
          mod7_mat.v[2] = matv2f;
          mod7_mat.v[3] = matv3f;
- 
+
          float4 vect = { red_sum[i], green_sum[i], blue_sum[i], qsum[i] };
- 
+
          mat4t rmod7_mat = invertMat4t(mod7_mat);
          float4 rgbovec = transform(rmod7_mat, vect);
          rgbo_vectors[i] = rgbovec;
- 
+
          // we will occasionally get a failure due to a singluar matrix. Record whether such a
          // failure has taken place; if it did, compute rgbo_vectors[] with a different method
          // later on.
          float chkval = dot(rgbovec, rgbovec);
          rgbo_fail[i] = chkval != chkval;
- 
+
      }
- 
- 
- 
+
+
+
      // initialize the luminance and scale vectors with a reasonable default,
      // just in case the subsequent calculation blows up.
      for (i = 0; i < partition_count; i++)
      {
- 
+
          float scalediv = scale_min[i] / scale_max[i];
          if (!(scalediv > 0.0f))
              scalediv = 0.0f;    // set to zero if scalediv is zero, negative, or NaN.
- 
+
          if (scalediv > 1.0f)
              scalediv = 1.0f;
          float3 tmp1 = scale_directions[i] * scale_max[i];
@@ -4481,12 +4454,12 @@ static void recompute_ideal_colors(int weight_quantization_mode,
          float2 lumf = {lum_min[i], lum_max[i]};
          lum_vectors[i] = lumf;
      }
- 
- 
- 
+
+
+
      for (i = 0; i < partition_count; i++)
      {
- 
+
          if (wmin1[i] >= wmax1[i] * 0.999)
          {
              // if all weights in the partition were equal, then just take average
@@ -4495,7 +4468,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                            (green_vec[i].x + green_vec[i].y) / green_weight_sum[i],
                            (blue_vec[i].x + blue_vec[i].y) / blue_weight_sum[i],
                            (alpha_vec[i].x + alpha_vec[i].y) / alpha_weight_sum[i]};
- 
+
              if (plane2_color_component != 0 && avg.x == avg.x)
                  ep->endpt0[i].x = ep->endpt1[i].x = avg.x;
              if (plane2_color_component != 1 && avg.y == avg.y)
@@ -4511,10 +4484,10 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              float2 lumval2 = {lumval, lumval};
              lum_vectors[i] = lumval2;
          }
- 
+
          else
          {
- 
+
              // otherwise, complete the analytic calculation of ideal-endpoint-values
              // for the given set of texel weigths and pixel colors.
 
@@ -4530,7 +4503,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              float alpha_det1 = determinant(pmat1_alpha[i]);
              float lum_det1 = determinant(pmat1_lum[i]);
              float scale_det1 = determinant(pmat1_scale[i]);
- 
+
              float red_mss1 = mat_square_sum(pmat1_red[i]);
              float green_mss1 = mat_square_sum(pmat1_green[i]);
              float blue_mss1 = mat_square_sum(pmat1_blue[i]);
@@ -4549,7 +4522,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              pmat1_alpha[i] = invertMat2t(pmat1_alpha[i]);
              pmat1_lum[i]   = invertMat2t(pmat1_lum[i]);
              pmat1_scale[i] = invertMat2t(pmat1_scale[i]);
- 
+
              float4 ep0 = {dot(pmat1_red[i].v[0], red_vec[i]),
                            dot(pmat1_green[i].v[0], green_vec[i]),
                            dot(pmat1_blue[i].v[0], blue_vec[i]),
@@ -4559,13 +4532,13 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                            dot(pmat1_green[i].v[1], green_vec[i]),
                            dot(pmat1_blue[i].v[1], blue_vec[i]),
                            dot(pmat1_alpha[i].v[1], alpha_vec[i])};
- 
+
              float lum_ep0    = dot(pmat1_lum[i].v[0], lum_vec[i]);
              float lum_ep1    = dot(pmat1_lum[i].v[1], lum_vec[i]);
              float scale_ep0  = dot(pmat1_scale[i].v[0], scale_vec[i]);
              float scale_ep1  = dot(pmat1_scale[i].v[1], scale_vec[i]);
- 
- 
+
+
              if (plane2_color_component != 0 && fabs(red_det1) > (red_mss1 * FLOAT_n4) && ep0.x == ep0.x && ep1.x == ep1.x)
              {
                  ep->endpt0[i].x = ep0.x;
@@ -4586,7 +4559,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                  ep->endpt0[i].w = ep0.w;
                  ep->endpt1[i].w = ep1.w;
              }
- 
+
              if (fabs(lum_det1) > (lum_mss1 * FLOAT_n4) && lum_ep0 == lum_ep0 && lum_ep1 == lum_ep1 && lum_ep0 < lum_ep1)
              {
                  lum_vectors[i].x = lum_ep0;
@@ -4599,9 +4572,9 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                  float4 rgbs_vectorsf = { tmp3.x,tmp3.y,tmp3.z, scalediv};
                  rgbs_vectors[i] = rgbs_vectorsf;
              }
- 
+
          }
- 
+
          if (plane2_weight_set8)
          {
              if (wmin2[i] >= wmax2[i] * 0.999)
@@ -4612,7 +4585,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                                (green_vec[i].x + green_vec[i].y) / green_weight_sum[i],
                                (blue_vec[i].x + blue_vec[i].y) / blue_weight_sum[i],
                                (alpha_vec[i].x + alpha_vec[i].y) / alpha_weight_sum[i]};
- 
+
                  if (plane2_color_component == 0 && avg.x == avg.x)
                      ep->endpt0[i].x = ep->endpt1[i].x = avg.x;
                  if (plane2_color_component == 1 && avg.y == avg.y)
@@ -4624,14 +4597,14 @@ static void recompute_ideal_colors(int weight_quantization_mode,
              }
              else
              {
- 
+
                  // otherwise, complete the analytic calculation of ideal-endpoint-values
                  // for the given set of texel weigths and pixel colors.
                  float red_det2 = determinant(pmat2_red[i]);
                  float green_det2 = determinant(pmat2_green[i]);
                  float blue_det2 = determinant(pmat2_blue[i]);
                  float alpha_det2 = determinant(pmat2_alpha[i]);
- 
+
                  float red_mss2 = mat_square_sum(pmat2_red[i]);
                  float green_mss2 = mat_square_sum(pmat2_green[i]);
                  float blue_mss2 = mat_square_sum(pmat2_blue[i]);
@@ -4641,7 +4614,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
 //                 if ((get_global_id(0) == 0) && (get_global_id(1) == 0))
 //#endif
 //                     printf("Plane-2 partition %d determinants: R=%g G=%g B=%g A=%g\n", i, red_det2, green_det2, blue_det2, alpha_det2);
- 
+
                  pmat2_red[i]   = invertMat2t(pmat2_red[i]);
                  pmat2_green[i] = invertMat2t(pmat2_green[i]);
                  pmat2_blue[i]  = invertMat2t(pmat2_blue[i]);
@@ -4654,7 +4627,7 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                                dot(pmat2_green[i].v[1], green_vec[i]),
                                dot(pmat2_blue[i].v[1], blue_vec[i]),
                                dot(pmat2_alpha[i].v[1], alpha_vec[i])};
- 
+
                  if (plane2_color_component == 0 && fabs(red_det2) > (red_mss2 * FLOAT_n4) && ep0.x == ep0.x && ep1.x == ep1.x)
                  {
                      ep->endpt0[i].x = ep0.x;
@@ -4675,11 +4648,11 @@ static void recompute_ideal_colors(int weight_quantization_mode,
                      ep->endpt0[i].w = ep0.w;
                      ep->endpt1[i].w = ep1.w;
                  }
- 
+
              }
          }
      }
- 
+
      // if the calculation of an RGB-offset vector failed, try to compute
      // a somewhat-sensible value anyway
      float3 onef = {1.0f,1.0f,1.0f};
@@ -4712,7 +4685,7 @@ static inline int imageblock_uses_alpha4(imageblock * blk)
     return blk->alpha_max != blk->alpha_min;
 }
 
-static void compute_averages_and_directions_2_components(__global __constant partition_info * pt,
+static void compute_averages_and_directions_2_components( const partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb, float2 * color_scalefactors, int component1, int component2, float2 * averages, float2 * directions)
 {
@@ -4792,10 +4765,10 @@ static void compute_averages_and_directions_2_components(__global __constant par
 
 }
 
-static void compute_endpoints_and_ideal_weights_2_components( __global __constant partition_info * pt,
+static void compute_endpoints_and_ideal_weights_2_components(  const partition_info * pt,
     imageblock * blk, error_weight_block * ewb,
     endpoints_and_weights * ei, int component1, int component2,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     int i;
 
@@ -5023,10 +4996,10 @@ static void compute_endpoints_and_ideal_weights_2_components( __global __constan
 
 
 static void compute_endpoints_and_ideal_weights_1_component(
-    __global __constant partition_info * pt, imageblock * blk,
+     const partition_info * pt, imageblock * blk,
     error_weight_block * ewb, endpoints_and_weights * ei,
     int component,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     int i;
 
@@ -5141,13 +5114,13 @@ static void compute_endpoints_and_ideal_weights_1_component(
 }
 
 static void compute_endpoints_and_ideal_weights_2_planes(
-    __global __constant partition_info * pt,
-    imageblock * blk, 
-    error_weight_block * ewb, 
+     const partition_info * pt,
+    imageblock * blk,
+    error_weight_block * ewb,
     int separate_component,
-    endpoints_and_weights * ei1, 
+    endpoints_and_weights * ei1,
     endpoints_and_weights * ei2,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     int uses_alpha = imageblock_uses_alpha4(blk);
     switch (separate_component)
@@ -5191,11 +5164,11 @@ static void compute_endpoints_and_ideal_weights_2_planes(
 
 // function to compute the error across a tile when using a particular line for
 // a particular partition.
-static float compute_error_squared_rgb_single_partition(int partition_to_test, 
-     __global __constant partition_info * pt,    // the partition that we use when computing the squared-error.
-    imageblock * blk, error_weight_block * ewb, 
+static float compute_error_squared_rgb_single_partition(int partition_to_test,
+      const partition_info * pt,    // the partition that we use when computing the squared-error.
+    imageblock * blk, error_weight_block * ewb,
     processed_line3 * lin,    // the line for the partition.
-    __global ASTC_Encode *ASTCEncode
+     ASTC_Encode *ASTCEncode
 )
 {
     int i;
@@ -5268,10 +5241,10 @@ static void merge_endpoints(endpoints * ep1,    // contains three of the color c
 }
 
 static void compute_encoding_choice_errors(
-    imageblock * pb, __global __constant partition_info * pi, error_weight_block * ewb,
+    imageblock * pb,  const partition_info * pi, error_weight_block * ewb,
     int separate_component,    // component that is separated out in 2-plane mode, -1 in 1-plane mode
     encoding_choice_errors * eci,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     int i;
 
@@ -5455,9 +5428,9 @@ static void compute_encoding_choice_errors(
 
 // for a given partition, compute for every (integer-component-count, quantization-level)
 // the color error.
-//static 
+//static
 void compute_color_error_for_every_integer_count_and_quantization_level(int encode_hdr_rgb,    // 1 = perform HDR encoding, 0 = perform LDR encoding.
-    int encode_hdr_alpha, int partition_index, __global __constant partition_info * pi,
+    int encode_hdr_alpha, int partition_index,  const partition_info * pi,
     encoding_choice_errors * eci,    // pointer to the structure for the CURRENT partition.
     endpoints * ep, float4 error_weightings[4],
     // arrays to return results back through.
@@ -5785,7 +5758,7 @@ static void one_partition_find_best_combination_for_bitcount(float combined_best
 }
 
 // for 2 partitions, find the best format combinations for every (quantization-mode, integer-count) combination
-static 
+static
 void two_partitions_find_best_combination_for_every_quantization_and_integer_count(float best_error[2][21][4],    // indexed by (partition, quant-level, integer-pair-count-minus-1)
     int format_of_choice[2][21][4],
     float combined_best_error[21][7],    // indexed by (quant-level, integer-pair-count-minus-2)
@@ -5825,10 +5798,10 @@ void two_partitions_find_best_combination_for_every_quantization_and_integer_cou
 // for 2 partitions, find the best combination (two formats + a quantization level) for a given bitcount
 static void two_partitions_find_best_combination_for_bitcount(float combined_best_error[21][7],
     int formats_of_choice[21][7][2],
-    int bits_available, int 
-    *best_quantization_level, 
-    int *best_quantization_level_mod, 
-    int *best_formats, 
+    int bits_available, int
+    *best_quantization_level,
+    int *best_quantization_level_mod,
+    int *best_formats,
     float *error_of_best_combination)
 {
     int i;
@@ -6062,18 +6035,18 @@ static void four_partitions_find_best_combination_for_bitcount(float combined_be
 #endif
 
 static void determine_optimal_set_of_endpoint_formats_to_use(
-      __global __constant partition_info * pt, 
-      imageblock * blk, 
+       const partition_info * pt,
+      imageblock * blk,
       error_weight_block * ewb,
-      endpoints * ep, 
+      endpoints * ep,
       int separate_component,    // separate color component for 2-plane mode; -1 for single-plane mode
                                                       // bitcounts and errors computed for the various quantization methods
       int *qwt_bitcounts, float *qwt_errors,
       // output data
-      int partition_format_specifiers[4][4], 
+      int partition_format_specifiers[4][4],
       int quantized_weight[4],
       int quantization_level[4], int quantization_level_mod[4],
-      __global ASTC_Encode *ASTCEncode)
+       ASTC_Encode *ASTCEncode)
 {
     int i, j;
     int partition_count = pt->partition_count;
@@ -6187,7 +6160,7 @@ static void determine_optimal_set_of_endpoint_formats_to_use(
             }
 
             three_partitions_find_best_combination_for_bitcount(combined_best_error,
-                                                                formats_of_choice, qwt_bitcounts[i], &best_quantization_level, &best_quantization_level_mod, best_formats, 
+                                                                formats_of_choice, qwt_bitcounts[i], &best_quantization_level, &best_quantization_level_mod, best_formats,
                                                                 &error_of_best_combination);
             error_of_best_combination += qwt_errors[i];
 
@@ -6279,13 +6252,13 @@ static void determine_optimal_set_of_endpoint_formats_to_use(
 
 //==================================================================================
 
-/* 
+/*
      quantize an LDR RGB color. Since this is a fallback encoding, we cannot actually
      fail but must just go on until we can produce a sensible result.
- 
+
      Due to how this encoding works, color0 cannot be larger than color1; as such,
      if color0 is actually larger than color1, then color0 is reduced and color1 is
-     increased until color0 is no longer larger than color1. 
+     increased until color0 is no longer larger than color1.
 */
 static int cqt_lookup(int quantization_level, int value)
  {
@@ -6308,7 +6281,7 @@ static inline float clamp255(float val)
      }
      else
          val = 0.0f;
- 
+
      return val;
  }
 
@@ -6324,28 +6297,28 @@ static inline float clamp01(float val)
      }
      else
          val = 0.0f;
- 
+
      return val;
  }
 
 static void quantize_rgb(
     float4 color0,    // LDR: 0=lowest, 255=highest
-    float4 color1, 
-    int output[6], 
+    float4 color1,
+    int output[6],
     int quantization_level)
  {
      color0.xyz = color0.xyz * (1.0f / 257.0f);
      color1.xyz = color1.xyz * (1.0f / 257.0f);
- 
- 
+
+
      float r0 = clamp255(color0.x);
      float g0 = clamp255(color0.y);
      float b0 = clamp255(color0.z);
- 
+
      float r1 = clamp255(color1.x);
      float g1 = clamp255(color1.y);
      float b1 = clamp255(color1.z);
- 
+
      int ri0, gi0, bi0, ri1, gi1, bi1;
      int ri0b, gi0b, bi0b, ri1b, gi1b, bi1b;
      float rgb0_addon = 0.5f;
@@ -6359,20 +6332,20 @@ static void quantize_rgb(
          ri1 = cqt_lookup(quantization_level, (int)floor(r1 + rgb1_addon));
          gi1 = cqt_lookup(quantization_level, (int)floor(g1 + rgb1_addon));
          bi1 = cqt_lookup(quantization_level, (int)floor(b1 + rgb1_addon));
- 
+
          ri0b = color_unquantization_tables[quantization_level][ri0];
          gi0b = color_unquantization_tables[quantization_level][gi0];
          bi0b = color_unquantization_tables[quantization_level][bi0];
          ri1b = color_unquantization_tables[quantization_level][ri1];
          gi1b = color_unquantization_tables[quantization_level][gi1];
          bi1b = color_unquantization_tables[quantization_level][bi1];
- 
+
          rgb0_addon -= 0.2f;
          rgb1_addon += 0.2f;
          iters++;
      }
      while (ri0b + gi0b + bi0b > ri1b + gi1b + bi1b);
- 
+
      output[0] = ri0;
      output[1] = ri1;
      output[2] = gi0;
@@ -6383,8 +6356,8 @@ static void quantize_rgb(
 
 /* quantize an RGBA color. */
 static void quantize_rgba(
-    float4 color0, 
-    float4 color1, 
+    float4 color0,
+    float4 color1,
     int output[8], int quantization_level)
 {
     color0.w = color0.w * (1.0f / 257.0f);
@@ -6966,7 +6939,7 @@ static void quantize0(int output[8])
 }
 
 // quantize and unquantize a number, wile making sure to retain the top two bits.
-static  
+static
 void quantize_and_unquantize_retain_top_two_bits(int quantization_level, int value_to_quantize,    // 0 to 255.
     int *quantized_value, int *unquantized_value)
 {
@@ -7002,7 +6975,7 @@ void quantize_and_unquantize_retain_top_two_bits(int quantization_level, int val
 }
 
 // quantize and unquantize a number, wile making sure to retain the top four bits.
-static  
+static
 void quantize_and_unquantize_retain_top_four_bits(int quantization_level, int value_to_quantize,    // 0 to 255.
     int *quantized_value, int *unquantized_value)
 {
@@ -8871,14 +8844,14 @@ void hdr_rgb_hdr_alpha_unpack3(int input[8], int quantization_level, ushort4 * o
 }
 
 static void unpack_color_endpoints(
-    int format, 
-    int quantization_level, 
-    int *input, 
+    int format,
+    int quantization_level,
+    int *input,
     int *rgb_hdr,                           // out
     int *alpha_hdr,                         // out
     int *nan_endpoint,                      // out
     ushort4 * output0, ushort4 * output1,   // out
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("unpack_color_endpoints");
     *nan_endpoint = 0;
@@ -9097,11 +9070,11 @@ static void unpack_color_endpoints(
 
 }
 
-static ushort4 lerp_color_int( 
-                        const ushort4 &color0, 
-                        const ushort4 &color1, 
+static ushort4 lerp_color_int(
+                        const ushort4 &color0,
+                        const ushort4 &color1,
                         const int4 &tmp_weight1,
-                       __global ASTC_Encode *ASTCEncode
+                        ASTC_Encode *ASTCEncode
 )
 {
     DEBUG("lerp_color_int");
@@ -9110,7 +9083,7 @@ static ushort4 lerp_color_int(
     int4 tmp_weight0 = { 64, 64, 64, 64 };
 
     tmp_weight0 = tmp_weight0 - tmp_weight1;
- 
+
     if (ASTCEncode->m_decode_mode == ASTC_DECODE_LDR_SRGB)
     {
         ecolor0 = ecolor0 >> 8;
@@ -9138,7 +9111,7 @@ static ushort4 COMPUTE_LRP_COLOR(
     int                   plane1_weight,
     int                   plane2_weight,
     int                     plane2_color_component,
-    __global ASTC_Encode    *ASTCEncode
+     ASTC_Encode    *ASTCEncode
 )
 {
     DEBUG("COMPUTE_LRP_COLOR");
@@ -9179,11 +9152,11 @@ static ushort4 COMPUTE_LRP_COLOR(
 // for each weight, unquantize the weight, use it to compute a color and a color error.
 // then, increment the weight until the color error stops decreasing
 // then, decrement the weight until the color error stops increasing
-static void COMPUTE_ERROR( 
-     float                   *errorvar, 
+static void COMPUTE_ERROR(
+     float                   *errorvar,
      int                     texels_to_evaluate,
-     __global __constant decimation_table        *it,
-     __global __constant partition_info          *pt,
+      const decimation_table        *it,
+      const partition_info          *pt,
      float                   uq_plane1_weights[MAX_WEIGHTS_PER_BLOCK],
      float                   uq_plane2_weights[MAX_WEIGHTS_PER_BLOCK],
      int                     is_dual_plane,
@@ -9193,21 +9166,21 @@ static void COMPUTE_ERROR(
      imageblock              *blk,
      int                     plane2_color_component,
      error_weight_block      *ewb,
-     __global ASTC_Encode    *ASTCEncode)
+      ASTC_Encode    *ASTCEncode)
 {
     DEBUG("COMPUTE_ERROR");
     *errorvar = 0.0f;
     for (int j = 0; j < texels_to_evaluate; j++)
-    { 
-        int texel = it->weight_texel[i][j]; 
-        int partition = pt->partition_of_texel[texel]; 
-        float plane1_weight = compute_value_of_texel_flt_localVar(texel, it, uq_plane1_weights);
-        float plane2_weight = 0.0f; 
+    {
+        int texel = it->weight_texel[i][j];
+        int partition = pt->partition_of_texel[texel];
+        float plane1_weight = compute_value_of_texel_flt(texel, it, uq_plane1_weights);
+        float plane2_weight = 0.0f;
         if (is_dual_plane)
         {
-            plane2_weight = compute_value_of_texel_flt_localVar(texel, it, uq_plane2_weights);
+            plane2_weight = compute_value_of_texel_flt(texel, it, uq_plane2_weights);
         }
-        
+
         int int_plane1_weight = int(floor( plane1_weight*64.0f + 0.5f ) );
         int int_plane2_weight = int(floor( plane2_weight*64.0f + 0.5f ) );
 
@@ -9246,12 +9219,12 @@ static void COMPUTE_ERROR(
 }
 
 static int realign_weights(
-    imageblock * blk, 
-    error_weight_block * ewb, 
-    symbolic_compressed_block * scb, 
-    __global2 uint8_t * weight_set8, 
-    __global2 uint8_t * plane2_weight_set8, 
-    __global ASTC_Encode *ASTCEncode)
+    imageblock * blk,
+    error_weight_block * ewb,
+    symbolic_compressed_block * scb,
+    uint8_t * weight_set8,
+    uint8_t * plane2_weight_set8,
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("realign_weights");
     int i;
@@ -9285,7 +9258,7 @@ static int realign_weights(
     int weight_count = ASTCEncode->bsd->decimation_tables[modeindex].num_weights;
 
     // read and unquantize the weights.
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
+    const quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
 
     for (i = 0; i < weight_count; i++)
     {
@@ -9525,15 +9498,15 @@ static void compress_symbolic_block_fixed_partition_1_plane(
     int max_refinement_iters,
     int partition_count, int partition_index,
     imageblock * blk,
-    error_weight_block * ewb, 
+    error_weight_block * ewb,
     symbolic_compressed_block * scb,
     endpoints_and_weights *ei1,
     endpoints_and_weights *eix1,
-    __global2 float   *decimated_weights,
-    __global2 uint8_t *u8_quantized_decimated_quantized_weights,
-    __global2 float   *decimated_quantized_weights,
-    __global2 float   *flt_quantized_decimated_quantized_weights,
-    __global ASTC_Encode *ASTCEncode)
+    float   *decimated_weights,
+    uint8_t *u8_quantized_decimated_quantized_weights,
+    float   *decimated_quantized_weights,
+    float   *flt_quantized_decimated_quantized_weights,
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compress_symbolic_block_fixed_partition_1_plane");
 
@@ -9549,11 +9522,11 @@ static void compress_symbolic_block_fixed_partition_1_plane(
     for (i = 0; i < MAX_DECIMATION_MODES; i++)
      {
          if (ASTCEncode->bsd->permit_encode[i] == 0 ||
-             ASTCEncode->bsd->decimation_mode_maxprec_1plane[i] < 0 || 
+             ASTCEncode->bsd->decimation_mode_maxprec_1plane[i] < 0 ||
              ASTCEncode->bsd->decimation_mode_percentile[i] > mode_cutoff)
              continue;
          eix1[i] = *ei1;
-         compute_ideal_weights_for_decimation_table(&(eix1[i]), 
+         compute_ideal_weights_for_decimation_table(&(eix1[i]),
                                                      &ASTCEncode->bsd->decimation_tables[i],
                                                      decimated_quantized_weights + i * MAX_WEIGHTS_PER_BLOCK,
                                                      decimated_weights + i * MAX_WEIGHTS_PER_BLOCK);
@@ -9578,27 +9551,27 @@ static void compress_symbolic_block_fixed_partition_1_plane(
            if (ep.w > 0.5f && ep.w < min_ep.w)
                min_ep.w = ep.w;
      }
- 
+
     float min_wt_cutoff = (float)min(min(min_ep.x, min_ep.y), min(min_ep.z, min_ep.w));
- 
+
     // for each mode, use the angular method to compute a shift.
     float weight_low_value[MAX_WEIGHT_MODES];
     float weight_high_value[MAX_WEIGHT_MODES];
 
-    compute_angular_endpoints_1plane(mode_cutoff, 
-                                     decimated_quantized_weights, 
-                                     decimated_weights, 
+    compute_angular_endpoints_1plane(mode_cutoff,
+                                     decimated_quantized_weights,
+                                     decimated_weights,
                                      weight_low_value, weight_high_value,
                                      ASTCEncode);
- 
+
     // for each mode (which specifies a decimation and a quantization):
      // * compute number of bits needed for the quantized weights.
      // * generate an optimized set of quantized weights.
      // * compute quantization errors for the mode.
- 
+
     int qwt_bitcounts[MAX_WEIGHT_MODES];
     float qwt_errors[MAX_WEIGHT_MODES];
- 
+
     for (i = 0; i < MAX_WEIGHT_MODES; i++)
      {
          if (ASTCEncode->bsd->block_modes[i].permit_encode == 0 || ASTCEncode->bsd->block_modes[i].is_dual_plane != 0 || ASTCEncode->bsd->block_modes[i].percentile > mode_cutoff)
@@ -9608,13 +9581,13 @@ static void compress_symbolic_block_fixed_partition_1_plane(
          }
          if (weight_high_value[i] > 1.02f * min_wt_cutoff)
              weight_high_value[i] = 1.0f;
- 
+
          int decimation_mode = ASTCEncode->bsd->block_modes[i].decimation_mode;
          if (ASTCEncode->bsd->decimation_mode_percentile[decimation_mode] > mode_cutoff)
          {
              astc_codec_internal_error("ERROR: compress_symbolic_block_fixed_partition_1_plane");
          }
- 
+
          // compute weight bitcount for the mode
          uint8_t qmode = ASTCEncode->bsd->block_modes[i].quantization_mode;
          int nweights = ASTCEncode->bsd->decimation_tables[decimation_mode].num_weights;
@@ -9627,8 +9600,8 @@ static void compress_symbolic_block_fixed_partition_1_plane(
              continue;
          }
          qwt_bitcounts[i] = bitcount;
- 
- 
+
+
          // then, generate the optimized set of weights for the weight mode.
          compute_ideal_quantized_weights_for_decimation_table(&(eix1[decimation_mode]),
                                                               &ASTCEncode->bsd->decimation_tables[decimation_mode],
@@ -9644,7 +9617,7 @@ static void compress_symbolic_block_fixed_partition_1_plane(
 
          // then, compute weight-errors for the weight mode.
 
-         qwt_errors[i] = compute_error_of_weight_set(&(eix1[decimation_mode]), 
+         qwt_errors[i] = compute_error_of_weight_set(&(eix1[decimation_mode]),
                                                      &ASTCEncode->bsd->decimation_tables[decimation_mode],
                                                      flt_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * i);
 //#ifdef __OPENCL_VERSION__
@@ -9654,54 +9627,54 @@ static void compress_symbolic_block_fixed_partition_1_plane(
 
 
      }
- 
+
     // for each weighting mode, determine the optimal combination of color endpoint encodings
      // and weight encodings; return results for the 4 best-looking modes.
- 
+
     int partition_format_specifiers[4][4];
     int quantized_weight[4];
     int color_quantization_level[4];
     int color_quantization_level_mod[4];
 
-    determine_optimal_set_of_endpoint_formats_to_use( &ASTCEncode->partition_tables[partition_count][partition_index], 
-                                                      blk, 
-                                                      ewb, 
-                                                      &(ei1->ep), 
+    determine_optimal_set_of_endpoint_formats_to_use( &ASTCEncode->partition_tables[partition_count][partition_index],
+                                                      blk,
+                                                      ewb,
+                                                      &(ei1->ep),
                                                       -1,    // used to flag that we are in single-weight mode
-                                                      qwt_bitcounts, 
-                                                      qwt_errors, 
-                                                      partition_format_specifiers, 
-                                                      quantized_weight, 
-                                                      color_quantization_level, 
-                                                      color_quantization_level_mod, 
+                                                      qwt_bitcounts,
+                                                      qwt_errors,
+                                                      partition_format_specifiers,
+                                                      quantized_weight,
+                                                      color_quantization_level,
+                                                      color_quantization_level_mod,
                                                       ASTCEncode);
 
     // then iterate over the 4 believed-to-be-best modes to find out which one is
     // actually best.
     for (i = 0; i < 4; i++)
      {
-         __global2 uint8_t *u8_weight_src;
+         uint8_t *u8_weight_src;
          int weights_to_copy;
- 
+
          if (quantized_weight[i] < 0)
          {
              scb->error_block = 1;
              scb++;
              continue;
          }
- 
+
          int decimation_mode = ASTCEncode->bsd->block_modes[quantized_weight[i]].decimation_mode;
          int weight_quantization_mode = ASTCEncode->bsd->block_modes[quantized_weight[i]].quantization_mode;
- 
+
          u8_weight_src = u8_quantized_decimated_quantized_weights + (MAX_WEIGHTS_PER_BLOCK * quantized_weight[i]);
- 
+
          weights_to_copy = ASTCEncode->bsd->decimation_tables[decimation_mode].num_weights;
- 
+
          // recompute the ideal color endpoints before storing them.
          float4 rgbs_colors[4];
          float4 rgbo_colors[4];
          float2 lum_intervals[4];
- 
+
          int l;
          for (l = 0; l < max_refinement_iters; l++)
          {
@@ -9710,14 +9683,14 @@ static void compress_symbolic_block_fixed_partition_1_plane(
 //#endif
 //             printf("B1:eix1[decimation_mode].ep.endpt0[0].x %3.3f\n", eix1[decimation_mode].ep.endpt0[0].x);
 
-             recompute_ideal_colors(weight_quantization_mode, 
-                                    &(eix1[decimation_mode].ep), 
-                                    rgbs_colors, rgbo_colors, 
-                                    lum_intervals, u8_weight_src, 
+             recompute_ideal_colors(weight_quantization_mode,
+                                    &(eix1[decimation_mode].ep),
+                                    rgbs_colors, rgbo_colors,
+                                    lum_intervals, u8_weight_src,
                                     0, -1, &ASTCEncode->partition_tables[partition_count][partition_index],
                                     &ASTCEncode->bsd->decimation_tables[decimation_mode],
                                     blk, ewb, ASTCEncode);
- 
+
              // quantize the chosen color
 //#ifdef __OPENCL_VERSION__
 //             if ((get_global_id(0) == 0) && (get_global_id(1) == 0))
@@ -9729,17 +9702,17 @@ static void compress_symbolic_block_fixed_partition_1_plane(
              {
                  scb->color_formats[j] = pack_color_endpoints(eix1[decimation_mode].ep.endpt0[j],
                                              eix1[decimation_mode].ep.endpt1[j],
-                                             rgbs_colors[j], rgbo_colors[j], partition_format_specifiers[i][j], 
+                                             rgbs_colors[j], rgbo_colors[j], partition_format_specifiers[i][j],
                                              scb->color_values[j], color_quantization_level[i]);
              }
- 
- 
+
+
              // if all the color endpoint modes are the same, we get a few more
              // bits to store colors; let's see if we can take advantage of this:
              // requantize all the colors and see if the endpoint modes remain the same;
              // if they do, then exploit it.
              scb->color_formats_matched = 0;
- 
+
              if (
                  (partition_count >= 2)
                  &&  ((scb->color_formats[0]) == scb->color_formats[1])
@@ -9771,39 +9744,39 @@ static void compress_symbolic_block_fixed_partition_1_plane(
                          scb->color_formats[j] = color_formats_mod[j];
                  }
              }
- 
- 
+
+
              // store header fields
              scb->partition_count = partition_count;
              scb->partition_index = partition_index;
              scb->color_quantization_level = scb->color_formats_matched ? color_quantization_level_mod[i] : color_quantization_level[i];
              scb->block_mode = quantized_weight[i];
              scb->error_block = 0;
- 
+
              if (scb->color_quantization_level < 4)
              {
                  scb->error_block = 1;    // should never happen, but cannot prove it impossible.
              }
- 
+
              // perform a final pass over the weights to try to improve them.
              int adjustments = realign_weights(
                                                blk, ewb, scb,
                                                u8_weight_src,
                                                0, ASTCEncode);
- 
+
            if (adjustments == 0)
                break;
          }
- 
+
          for (j = 0; j < weights_to_copy; j++)
              scb->plane1_weights[j] = u8_weight_src[j];
- 
+
          scb++;
      }
 
 }
 
-static int compute_value_of_texel_global(int texel_to_get, __global __constant decimation_table * it, int *weights)
+static int compute_value_of_texel_global(int texel_to_get,  const decimation_table * it, int *weights)
 {
     int i;
     int summed_value = 8;
@@ -9896,7 +9869,7 @@ static void imageblock_initialize_orig_from_work(imageblock * blk, int pixelcoun
 void decompress_symbolic_block(
     symbolic_compressed_block * scb,
     imageblock * blk,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("decompress_symbolic_block");
     int i;
@@ -10029,7 +10002,7 @@ void decompress_symbolic_block(
     int uq_plane2_weights[MAX_WEIGHTS_PER_BLOCK];
     int weight_count = ASTCEncode->bsd->decimation_tables[ASTCEncode->bsd->block_modes[scb->block_mode].decimation_mode].num_weights;
 
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
+    const quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
 
     for (i = 0; i < weight_count; i++)
     {
@@ -10087,7 +10060,7 @@ void decompress_symbolic_block(
 }
 
 static float compute_imageblock_difference(imageblock * p1, imageblock * p2, error_weight_block * ewb,
-                                    __global ASTC_Encode *ASTCEncode)
+                                     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_imageblock_difference");
  int i;
@@ -10110,8 +10083,8 @@ static float compute_imageblock_difference(imageblock * p1, imageblock * p2, err
 }
 
 // compute averages and covariance matrices for 4 components
-//static 
-void compute_covariance_matrix(imageblock * blk, error_weight_block * ewb, mat4t * cov_matrix, __global ASTC_Encode *ASTCEncode)
+//static
+void compute_covariance_matrix(imageblock * blk, error_weight_block * ewb, mat4t * cov_matrix,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_covariance_matrix");
     int i;
@@ -10180,11 +10153,11 @@ void compute_covariance_matrix(imageblock * blk, error_weight_block * ewb, mat4t
 }
 
 void prepare_block_statistics(
-    imageblock * blk, 
-    error_weight_block * ewb, 
-    int *is_normal_map, 
-    float *lowest_correl, 
-    __global ASTC_Encode *ASTCEncode)
+    imageblock * blk,
+    error_weight_block * ewb,
+    int *is_normal_map,
+    float *lowest_correl,
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("prepare_block_statistics");
     int i;
@@ -10250,13 +10223,13 @@ void prepare_block_statistics(
 }
 
 void compute_angular_endpoints_2planes(float mode_cutoff,
-    __global2 float *decimated_quantized_weights,
-    __global2 float *decimated_weights,
-    float low_value1[MAX_WEIGHT_MODES], 
-    float high_value1[MAX_WEIGHT_MODES], 
-    float low_value2[MAX_WEIGHT_MODES], 
+    float *decimated_quantized_weights,
+    float *decimated_weights,
+    float low_value1[MAX_WEIGHT_MODES],
+    float high_value1[MAX_WEIGHT_MODES],
+    float low_value2[MAX_WEIGHT_MODES],
     float high_value2[MAX_WEIGHT_MODES],
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_angular_endpoints_2planes");
     int i;
@@ -10272,22 +10245,22 @@ void compute_angular_endpoints_2planes(float mode_cutoff,
         float percentile    = ASTCEncode->bsd->decimation_mode_percentile[i];
         int permit_encode   = ASTCEncode->bsd->permit_encode[i];
         if (permit_encode == 0 || samplecount < 1 || quant_mode < 0 || percentile > mode_cutoff)
-            continue;                     
-                                          
+            continue;
+
         compute_angular_endpoints_for_quantization_levels(samplecount,
             decimated_quantized_weights + 2 * i * MAX_WEIGHTS_PER_BLOCK,
             decimated_weights + 2 * i * MAX_WEIGHTS_PER_BLOCK, quant_mode, low_values1[i], high_values1[i]);
-                                          
+
         compute_angular_endpoints_for_quantization_levels(samplecount,
             decimated_quantized_weights + (2 * i + 1) * MAX_WEIGHTS_PER_BLOCK,
             decimated_weights + (2 * i + 1) * MAX_WEIGHTS_PER_BLOCK, quant_mode, low_values2[i], high_values2[i]);
-                                          
-    }                                     
-                                          
+
+    }
+
     for (i = 0; i < MAX_WEIGHT_MODES; i++)
-    {                                     
+    {
         if (ASTCEncode->bsd->block_modes[i].is_dual_plane != 1 || ASTCEncode->bsd->block_modes[i].percentile > mode_cutoff)
-            continue;                     
+            continue;
         int quant_mode = ASTCEncode->bsd->block_modes[i].quantization_mode;
         int decim_mode = ASTCEncode->bsd->block_modes[i].decimation_mode;
 
@@ -10301,21 +10274,21 @@ void compute_angular_endpoints_2planes(float mode_cutoff,
 static void compress_symbolic_block_fixed_partition_2_planes(
     float mode_cutoff,
     int max_refinement_iters,
-    int partition_count, 
+    int partition_count,
     int partition_index,
-    int separate_component, 
-    imageblock * blk, 
+    int separate_component,
+    imageblock * blk,
     error_weight_block * ewb,
     symbolic_compressed_block * scb,
     endpoints_and_weights *ei1,
     endpoints_and_weights *ei2,
     endpoints_and_weights *eix1,
     endpoints_and_weights *eix2,
-    __global2 float   *decimated_weights,
-    __global2 uint8_t *u8_quantized_decimated_quantized_weights,
-    __global2 float   *decimated_quantized_weights,
-    __global2 float   *flt_quantized_decimated_quantized_weights,
-    __global ASTC_Encode *ASTCEncode)
+    float   *decimated_weights,
+    uint8_t *u8_quantized_decimated_quantized_weights,
+    float   *decimated_quantized_weights,
+    float   *flt_quantized_decimated_quantized_weights,
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compress_symbolic_block_fixed_partition_2_planes");
      int i, j, k;
@@ -10330,23 +10303,23 @@ static void compress_symbolic_block_fixed_partition_2_planes(
      {
          if (ASTCEncode->bsd->permit_encode[i] == 0 || ASTCEncode->bsd->decimation_mode_maxprec_2planes[i] < 0 || ASTCEncode->bsd->decimation_mode_percentile[i] > mode_cutoff)
              continue;
- 
+
          eix1[i] = *ei1;
          eix2[i] = *ei2;
          compute_ideal_weights_for_decimation_table(&(eix1[i]),
                                                      &ASTCEncode->bsd->decimation_tables[i],
-                                                     decimated_quantized_weights + (2 * i) * MAX_WEIGHTS_PER_BLOCK, 
+                                                     decimated_quantized_weights + (2 * i) * MAX_WEIGHTS_PER_BLOCK,
                                                      decimated_weights + (2 * i) * MAX_WEIGHTS_PER_BLOCK);
-         compute_ideal_weights_for_decimation_table(&(eix2[i]), 
+         compute_ideal_weights_for_decimation_table(&(eix2[i]),
                                                      &ASTCEncode->bsd->decimation_tables[i],
-                                                     decimated_quantized_weights + (2 * i + 1) * MAX_WEIGHTS_PER_BLOCK, 
+                                                     decimated_quantized_weights + (2 * i + 1) * MAX_WEIGHTS_PER_BLOCK,
                                                      decimated_weights + (2 * i + 1) * MAX_WEIGHTS_PER_BLOCK);
      }
- 
+
      // compute maximum colors for the endpoints and ideal weights.
      // for each endpoint-and-ideal-weight pair, compute the smallest weight value
      // that will result in a color value greater than 1.
- 
+
      float4 min_ep1 = {10.0f, 10.0f, 10.0f, 10.0f};
      float4 min_ep2 = {10.0f, 10.0f, 10.0f, 10.0f};
      for (i = 0; i < partition_count; i++)
@@ -10371,7 +10344,7 @@ static void compress_symbolic_block_fixed_partition_2_planes(
          if (ep2.w > 0.5f && ep2.w < min_ep2.w)
              min_ep2.w = ep2.w;
      }
- 
+
      float min_wt_cutoff1, min_wt_cutoff2;
      switch (separate_component)
      {
@@ -10394,25 +10367,25 @@ static void compress_symbolic_block_fixed_partition_2_planes(
      default:
          min_wt_cutoff2 = FLOAT_30;
      }
- 
+
      min_wt_cutoff1 = MIN(MIN(min_ep1.x, min_ep1.y), MIN(min_ep1.z, min_ep1.w));
 
      float weight_low_value1[MAX_WEIGHT_MODES];
      float weight_high_value1[MAX_WEIGHT_MODES];
      float weight_low_value2[MAX_WEIGHT_MODES];
      float weight_high_value2[MAX_WEIGHT_MODES];
- 
-     compute_angular_endpoints_2planes(mode_cutoff, 
-                                       decimated_quantized_weights, 
-                                       decimated_weights, weight_low_value1, 
-                                       weight_high_value1, weight_low_value2, weight_high_value2, 
+
+     compute_angular_endpoints_2planes(mode_cutoff,
+                                       decimated_quantized_weights,
+                                       decimated_weights, weight_low_value1,
+                                       weight_high_value1, weight_low_value2, weight_high_value2,
                                        ASTCEncode);
- 
+
      // for each mode (which specifies a decimation and a quantization):
      // * generate an optimized set of quantized weights.
      // * compute quantization errors for each mode
      // * compute number of bits needed for the quantized weights.
- 
+
      int qwt_bitcounts[MAX_WEIGHT_MODES];
      float qwt_errors[MAX_WEIGHT_MODES];
      for (i = 0; i < MAX_WEIGHT_MODES; i++)
@@ -10423,12 +10396,12 @@ static void compress_symbolic_block_fixed_partition_2_planes(
              continue;
          }
          int decimation_mode = ASTCEncode->bsd->block_modes[i].decimation_mode;
- 
+
          if (weight_high_value1[i] > 1.02f * min_wt_cutoff1)
              weight_high_value1[i] = 1.0f;
          if (weight_high_value2[i] > 1.02f * min_wt_cutoff2)
              weight_high_value2[i] = 1.0f;
- 
+
          // compute weight bitcount for the mode
          int bits_used_by_weights = compute_ise_bitcount(2 * ASTCEncode->bsd->decimation_tables[decimation_mode].num_weights,
                                                          (quantization_method)ASTCEncode->bsd->block_modes[i].quantization_mode);
@@ -10439,8 +10412,8 @@ static void compress_symbolic_block_fixed_partition_2_planes(
              continue;
          }
          qwt_bitcounts[i] = bitcount;
- 
- 
+
+
          // then, generate the optimized set of weights for the mode.
          compute_ideal_quantized_weights_for_decimation_table(&(eix1[decimation_mode]),
                                                               &ASTCEncode->bsd->decimation_tables[decimation_mode],
@@ -10448,7 +10421,7 @@ static void compress_symbolic_block_fixed_partition_2_planes(
                                                               weight_high_value1[i],
                                                               decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * decimation_mode),
                                                               flt_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i),
-                                                              u8_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i), 
+                                                              u8_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i),
                                                               ASTCEncode->bsd->block_modes[i].quantization_mode);
 
          compute_ideal_quantized_weights_for_decimation_table(&(eix2[decimation_mode]),
@@ -10457,41 +10430,41 @@ static void compress_symbolic_block_fixed_partition_2_planes(
                                                               weight_high_value2[i],
                                                               decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * decimation_mode + 1),
                                                               flt_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i + 1),
-                                                              u8_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i + 1), 
+                                                              u8_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i + 1),
                                                               ASTCEncode->bsd->block_modes[i].quantization_mode);
- 
- 
+
+
          // then, compute quantization errors for the block mode.
          qwt_errors[i] =
              compute_error_of_weight_set(&(eix1[decimation_mode]),
                                           &ASTCEncode->bsd->decimation_tables[decimation_mode],
                                           flt_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i))
-                                          + compute_error_of_weight_set(&(eix2[decimation_mode]), 
-                                          &ASTCEncode->bsd->decimation_tables[decimation_mode], 
+                                          + compute_error_of_weight_set(&(eix2[decimation_mode]),
+                                          &ASTCEncode->bsd->decimation_tables[decimation_mode],
                                           flt_quantized_decimated_quantized_weights + MAX_WEIGHTS_PER_BLOCK * (2 * i + 1));
      }
- 
- 
+
+
      // decide the optimal combination of color endpoint encodings and weight encoodings.
      int partition_format_specifiers[4][4];
      int quantized_weight[4];
      int color_quantization_level[4];
      int color_quantization_level_mod[4];
- 
+
      endpoints epm;
      merge_endpoints(&(ei1->ep), &(ei2->ep), separate_component, &epm);
- 
+
      determine_optimal_set_of_endpoint_formats_to_use(
                                                       &ASTCEncode->partition_tables[partition_count][partition_index],
                                                       blk,
                                                       ewb,
-                                                      &epm, separate_component, qwt_bitcounts, 
-                                                      qwt_errors, 
-                                                      partition_format_specifiers, 
+                                                      &epm, separate_component, qwt_bitcounts,
+                                                      qwt_errors,
+                                                      partition_format_specifiers,
                                                       quantized_weight,
-                                                      color_quantization_level, color_quantization_level_mod, 
+                                                      color_quantization_level, color_quantization_level_mod,
                                                       ASTCEncode);
- 
+
      for (i = 0; i < 4; i++)
      {
          if (quantized_weight[i] < 0)
@@ -10500,41 +10473,41 @@ static void compress_symbolic_block_fixed_partition_2_planes(
              scb++;
              continue;
          }
- 
-         __global2 uint8_t *u8_weight1_src;
-         __global2 uint8_t *u8_weight2_src;
+
+         uint8_t *u8_weight1_src;
+         uint8_t *u8_weight2_src;
          int weights_to_copy;
- 
+
          int decimation_mode = ASTCEncode->bsd->block_modes[quantized_weight[i]].decimation_mode;
          int weight_quantization_mode = ASTCEncode->bsd->block_modes[quantized_weight[i]].quantization_mode;
- 
+
          int weight1_offfset = MAX_WEIGHTS_PER_BLOCK * (2 * quantized_weight[i]);
          int weight2_offfset = MAX_WEIGHTS_PER_BLOCK * (2 * quantized_weight[i] + 1);
          u8_weight1_src = u8_quantized_decimated_quantized_weights + weight1_offfset;
          u8_weight2_src = u8_quantized_decimated_quantized_weights + weight2_offfset;
- 
- 
+
+
          weights_to_copy = ASTCEncode->bsd->decimation_tables[decimation_mode].num_weights;
- 
+
          // recompute the ideal color endpoints before storing them.
          merge_endpoints(&(eix1[decimation_mode].ep), &(eix2[decimation_mode].ep), separate_component, &epm);
- 
+
          float4 rgbs_colors[4];
          float4 rgbo_colors[4];
          float2 lum_intervals[4];
- 
+
          int l;
          for (l = 0; l < max_refinement_iters; l++)
          {
-             recompute_ideal_colors(weight_quantization_mode, 
-                                    &epm, rgbs_colors, rgbo_colors, lum_intervals, 
+             recompute_ideal_colors(weight_quantization_mode,
+                                    &epm, rgbs_colors, rgbo_colors, lum_intervals,
                                     u8_weight1_src,
                                     u8_weight2_src,
                                     separate_component, &ASTCEncode->partition_tables[partition_count][partition_index],
                                     &ASTCEncode->bsd->decimation_tables[decimation_mode],
                                     blk, ewb,
                                     ASTCEncode);
- 
+
              // store the colors for the block
              for (j = 0; j < partition_count; j++)
              {
@@ -10543,7 +10516,7 @@ static void compress_symbolic_block_fixed_partition_2_planes(
                                                               rgbs_colors[j], rgbo_colors[j],  partition_format_specifiers[i][j], scb->color_values[j], color_quantization_level[i]);
              }
              scb->color_formats_matched = 0;
- 
+
              if ((partition_count >= 2 && scb->color_formats[0] == scb->color_formats[1]
 //#                && color_quantization_level != color_quantization_level_mod
                   )
@@ -10568,8 +10541,8 @@ static void compress_symbolic_block_fixed_partition_2_planes(
                          scb->color_formats[j] = color_formats_mod[j];
                  }
              }
- 
- 
+
+
              // store header fields
              scb->partition_count = partition_count;
              scb->partition_index = partition_index;
@@ -10577,31 +10550,31 @@ static void compress_symbolic_block_fixed_partition_2_planes(
              scb->block_mode = quantized_weight[i];
              scb->plane2_color_component = separate_component;
              scb->error_block = 0;
- 
+
              if (scb->color_quantization_level < 4)
              {
                  scb->error_block = 1;    // should never happen, but cannot prove it impossible
              }
- 
+
              int adjustments = realign_weights(
                                                blk, ewb, scb,
                                                u8_weight1_src,
                                                u8_weight2_src,
                                                ASTCEncode);
- 
+
              if (adjustments == 0)
                  break;
          }
-  
+
          for (j = 0; j < weights_to_copy; j++)
          {
              scb->plane1_weights[j] = u8_weight1_src[j];
              scb->plane2_weights[j] = u8_weight2_src[j];
          }
- 
+
          scb++;
      }
- 
+
 }
 
 // for k++ means, we need pseudorandom numbers, however using random numbers directly
@@ -10609,7 +10582,7 @@ static void compress_symbolic_block_fixed_partition_2_planes(
 // just supply a handful of numbers from random.org, and apply an algorithm similar
 // to XKCD #221. (http://xkcd.com/221/)
 // cluster the texels using the k++ means clustering initialization algorithm.
-void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_centers, __global ASTC_Encode *ASTCEncode)
+void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_centers,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("kpp_initialize");
     int i;
@@ -10697,7 +10670,7 @@ void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_cent
 
 // basic K-means clustering: given a set of cluster centers,
 // assign each texel to a partition
-void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cluster_centers, int *partition_of_texel, __global ASTC_Encode *ASTCEncode)
+void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cluster_centers, int *partition_of_texel,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("basic_kmeans_assign_pass");
     int i, j;
@@ -10773,7 +10746,7 @@ void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cl
 
 // basic k-means clustering: given a set of cluster assignments
 // for the texels, find the center position of each cluster.
-void basic_kmeans_update(int partition_count, imageblock * blk, int *partition_of_texel, float4 * cluster_centers, __global ASTC_Encode *ASTCEncode)
+void basic_kmeans_update(int partition_count, imageblock * blk, int *partition_of_texel, float4 * cluster_centers,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("basic_kmeans_update");
     int i;
@@ -10811,7 +10784,7 @@ void basic_kmeans_update(int partition_count, imageblock * blk, int *partition_o
 // we  turn this set into 2, 3 or 4 bitmaps. Then, for each of the ( 64 bit uses 1024) (32 bit uses ???) partitions,
 // we try to match the bitmaps as well as possible.
 //# maybe an issue for GPU to work in 64bits
-//static inline 
+//static inline
 int bitcount(uint64_cl p)
 {
 #ifdef ENABLE_64Bit_Support
@@ -10862,7 +10835,7 @@ int bitcount(uint64_cl p)
     }
 }
 
-//static inline 
+//static inline
 int MIN3(int a, int b, int c)
 {
     int d = MIN(a, b);
@@ -10871,7 +10844,7 @@ int MIN3(int a, int b, int c)
 
 // compute the bit-mismatch for a partitioning in 2-partition mode
 //# maybe an issue for GPU to work in 64bits
-//static inline 
+//static inline
 int partition_mismatch2(uint64_cl a0, uint64_cl a1, uint64_cl b0, uint64_cl b1)
 {
     int v1 = bitcount(a0 ^ b0) + bitcount(a1 ^ b1);
@@ -10965,14 +10938,14 @@ static inline int partition_mismatch4(uint64_cl a0, uint64_cl a1, uint64_cl a2, 
 #endif
 
 //# maybe an issue for GPU to work in 64bits
-void count_partition_mismatch_bits( int partition_count, 
-                                    uint64_cl bitmaps[4], 
+void count_partition_mismatch_bits( int partition_count,
+                                    uint64_cl bitmaps[4],
                                     int bitcounts[PARTITION_COUNT],
-                                    __global ASTC_Encode *ASTCEncode)
+                                     ASTC_Encode *ASTCEncode)
 {
     DEBUG("count_partition_mismatch_bits");
     int i;
-    
+
     auto pi = ASTCEncode->partition_tables[partition_count];
 
     if (partition_count == 2)
@@ -10984,7 +10957,7 @@ void count_partition_mismatch_bits( int partition_count,
             if (pi->partition_count == 2)
             {
                 bitcounts[i] = partition_mismatch2(bm0, bm1,
-                    pi->coverage_bitmaps[0], 
+                    pi->coverage_bitmaps[0],
                     pi->coverage_bitmaps[1]);
             }
             else
@@ -11001,9 +10974,9 @@ void count_partition_mismatch_bits( int partition_count,
         {
             if (pi->partition_count == 3)
             {
-                bitcounts[i] = partition_mismatch3(bm0, bm1, bm2, 
-                    pi->coverage_bitmaps[0], 
-                    pi->coverage_bitmaps[1], 
+                bitcounts[i] = partition_mismatch3(bm0, bm1, bm2,
+                    pi->coverage_bitmaps[0],
+                    pi->coverage_bitmaps[1],
                     pi->coverage_bitmaps[2]);
             }
             else
@@ -11023,9 +10996,9 @@ void count_partition_mismatch_bits( int partition_count,
             if (pi->partition_count == 4)
             {
                 bitcounts[i] = partition_mismatch4(bm0, bm1, bm2, bm3,
-                    pi->coverage_bitmaps[0], 
-                    pi->coverage_bitmaps[1], 
-                    pi->coverage_bitmaps[2], 
+                    pi->coverage_bitmaps[0],
+                    pi->coverage_bitmaps[1],
+                    pi->coverage_bitmaps[2],
                     pi->coverage_bitmaps[3]);
             }
             else
@@ -11064,13 +11037,13 @@ void get_partition_ordering_by_mismatch_bits(int mismatch_bits[PARTITION_COUNT],
     }
 }
 
-static void kmeans_compute_partition_ordering(int partition_count, imageblock * blk, int *ordering, __global ASTC_Encode *ASTCEncode)
+static void kmeans_compute_partition_ordering(int partition_count, imageblock * blk, int *ordering,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("kmeans_compute_partition_ordering");
      int i;
      float4 cluster_centers[4];
      int partition_of_texel[MAX_TEXELS_PER_BLOCK];
- 
+
      // 3 passes of plain k-means partitioning
      for (i = 0; i < 3; i++)
      {
@@ -11078,18 +11051,18 @@ static void kmeans_compute_partition_ordering(int partition_count, imageblock * 
              kpp_initialize(partition_count, blk, cluster_centers, ASTCEncode);
          else
              basic_kmeans_update(partition_count, blk, partition_of_texel, cluster_centers, ASTCEncode);
- 
+
          basic_kmeans_assign_pass( partition_count, blk, cluster_centers, partition_of_texel, ASTCEncode);
      }
- 
+
      // at this point, we have a near-ideal partitioning.
- 
+
 //#  // construct bitmaps
      uint64_cl shiftbit = 1;
      uint64_cl bitmaps[4];
      for (i = 0; i < 4; i++)
          bitmaps[i] = 0;
-//# need to check the limit of 64bit when used in GPU 
+//# need to check the limit of 64bit when used in GPU
      int texels_to_process = ASTCEncode->bsd->texelcount_for_bitmap_partitioning;
      if (texels_to_process > COVERAGE_BITMAPS_MAX)
          texels_to_process = COVERAGE_BITMAPS_MAX;
@@ -11098,17 +11071,17 @@ static void kmeans_compute_partition_ordering(int partition_count, imageblock * 
          int idx = ASTCEncode->bsd->texels_for_bitmap_partitioning[i];
          bitmaps[partition_of_texel[idx]] |= shiftbit << i;
      }
- 
+
      int bitcounts[PARTITION_COUNT];
      // for each entry in the partition table, count bits of partition-mismatch.
      count_partition_mismatch_bits( partition_count, bitmaps, bitcounts, ASTCEncode);
- 
+
      // finally, sort the partitions by bits-of-partition-mismatch
      get_partition_ordering_by_mismatch_bits(bitcounts, ordering);
- 
+
 }
 
-static float compute_error_squared_rgba(__global __constant partition_info * pt,    // the partition that we use when computing the squared-error.
+static float compute_error_squared_rgba( const partition_info * pt,    // the partition that we use when computing the squared-error.
                                  imageblock * blk, error_weight_block * ewb, processed_line4 * plines, float *length_of_lines)
 {
     DEBUG("compute_error_squared_rgba");
@@ -11174,7 +11147,7 @@ static float compute_error_squared_rgba(__global __constant partition_info * pt,
  return errorsum;
 }
 
-static void compute_alpha_minmax(__global __constant partition_info * pt, imageblock * blk, error_weight_block * ewb, float *alpha_min, float *alpha_max, __global ASTC_Encode *ASTCEncode)
+static void compute_alpha_minmax( const partition_info * pt, imageblock * blk, error_weight_block * ewb, float *alpha_min, float *alpha_max,  ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_alpha_minmax");
     int i;
@@ -11214,7 +11187,7 @@ static void compute_alpha_minmax(__global __constant partition_info * pt, imageb
 
 #define TWO_COMPONENT_ERROR_FUNC( funcname, c0_iwt, c1_iwt, c01_name, c01_rname ) \
 static float funcname( \
-    __global __constant partition_info *pt, \
+     const partition_info *pt, \
     imageblock *blk, \
     error_weight_block *ewb, \
     processed_line2 *plines, \
@@ -11282,7 +11255,7 @@ TWO_COMPONENT_ERROR_FUNC(compute_error_squared_gb, 1, 2, yz, gb)
 
 #define THREE_COMPONENT_ERROR_FUNC( funcname, c0_iwt, c1_iwt, c2_iwt, c012_name, c012_rname ) \
 static float funcname( \
-    __global __constant partition_info *pt, \
+     const partition_info *pt, \
     imageblock *blk, \
     error_weight_block *ewb, \
     processed_line3 *plines, \
@@ -11346,14 +11319,14 @@ static float funcname( \
     THREE_COMPONENT_ERROR_FUNC(compute_error_squared_rgb, 0, 1, 2, xyz, rgb)
 
 
-static void compute_rgb_minmax( 
-    __global __constant partition_info * pt,
+static void compute_rgb_minmax(
+     const partition_info * pt,
      imageblock * blk,
-    error_weight_block * ewb, 
-    float *red_min, float *red_max, 
-    float *green_min, float *green_max, 
+    error_weight_block * ewb,
+    float *red_min, float *red_max,
+    float *green_min, float *green_max,
     float *blue_min, float *blue_max,
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
     DEBUG("compute_rgb_minmax");
     int i;
@@ -11416,7 +11389,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
     int *best_partitions_uncorrellated,     // best partitionings to use if the endpoint colors are assumed to be uncorrellated
     int *best_partitions_samechroma,        // best partitionings to use if the endpoint colors have the same chroma
     int *best_partitions_dual_weight_planes,// best partitionings to use if using dual plane of weightss
-    __global ASTC_Encode *ASTCEncode)
+     ASTC_Encode *ASTCEncode)
 {
 //#
     DEBUG("find_best_partitionings");
@@ -11461,12 +11434,12 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
 
       if (uses_alpha)
       {
-   
+
           for (i = 0; i < PARTITION_COUNT; i++)
           {
               int partition = partition_sequence[i];
               int bk_partition_count = ASTCEncode->partition_tables[partition_count][partition].partition_count;
-  
+
               if (bk_partition_count < partition_count)
               {
                   uncorr_errors[i] = FLOAT_35;
@@ -11482,7 +11455,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
               if (i >= partition_search_limit)
               {
                   defacto_search_limit = i;
-  
+
                   uncorr_errors[i] = FLOAT_34;
                   samechroma_errors[i] = FLOAT_34;
                   separate_red_errors[i] = FLOAT_34;
@@ -11491,7 +11464,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   separate_alpha_errors[i] = FLOAT_34;
                   break;
               }
-  
+
               // compute the weighting to give to each color channel
               // in each partition.
               float4 error_weightings[4];
@@ -11500,7 +11473,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
               compute_partition_error_color_weightings(ewb,
                                 &ASTCEncode->partition_tables[partition_count][partition],
                                 error_weightings, color_scalefactors, ASTCEncode);
-  
+
               for (j = 0; j < partition_count; j++)
               {
                   inverse_color_scalefactors[j].x = 1.0f / max(color_scalefactors[j].x, FLOAT_n7);
@@ -11508,43 +11481,43 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   inverse_color_scalefactors[j].z = 1.0f / max(color_scalefactors[j].z, FLOAT_n7);
                   inverse_color_scalefactors[j].w = 1.0f / max(color_scalefactors[j].w, FLOAT_n7);
               }
-  
+
               float4 averages[4];
               float4 directions_rgba[4];
               float3 directions_gba[4];
               float3 directions_rba[4];
               float3 directions_rga[4];
               float3 directions_rgb[4];
-  
+
               compute_averages_and_directions_rgba(
                                 &ASTCEncode->partition_tables[partition_count][partition],
                                 pb, ewb, color_scalefactors, averages, directions_rgba, directions_gba, directions_rba, directions_rga, directions_rgb);
-  
+
               line4 uncorr_lines[4];
               line4 samechroma_lines[4];
               line3 separate_red_lines[4];
               line3 separate_green_lines[4];
               line3 separate_blue_lines[4];
               line3 separate_alpha_lines[4];
-  
+
               processed_line4 proc_uncorr_lines[4];
               processed_line4 proc_samechroma_lines[4];
               processed_line3 proc_separate_red_lines[4];
               processed_line3 proc_separate_green_lines[4];
               processed_line3 proc_separate_blue_lines[4];
               processed_line3 proc_separate_alpha_lines[4];
-  
+
               float uncorr_linelengths[4];
               float samechroma_linelengths[4];
               float separate_red_linelengths[4];
               float separate_green_linelengths[4];
               float separate_blue_linelengths[4];
               float separate_alpha_linelengths[4];
- 
+
               float3 one3f  = { 1.0f,1.0f,1.0f};
               float4 zero4f = { 0.0f,0.0f,0.0f,0.0f };
               float4 one4f  = { 1.0f,1.0f,1.0f,1.0f };
- 
+
               for (j = 0; j < partition_count; j++)
               {
                   uncorr_lines[j].a = averages[j];
@@ -11554,12 +11527,12 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   }
                   else
                       uncorr_lines[j].b = normalize(directions_rgba[j]);
-  
+
                   proc_uncorr_lines[j].amod = (uncorr_lines[j].a - uncorr_lines[j].b * dot(uncorr_lines[j].a, uncorr_lines[j].b)) * inverse_color_scalefactors[j];
                   proc_uncorr_lines[j].bs = (uncorr_lines[j].b * color_scalefactors[j]);
                   proc_uncorr_lines[j].bis = (uncorr_lines[j].b * inverse_color_scalefactors[j]);
-  
-  
+
+
                   samechroma_lines[j].a = zero4f;
                   if (dot(averages[j], averages[j]) == 0)
                   {
@@ -11567,29 +11540,29 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   }
                   else
                       samechroma_lines[j].b = normalize(averages[j]);
-  
+
                   proc_samechroma_lines[j].amod = (samechroma_lines[j].a - samechroma_lines[j].b * dot(samechroma_lines[j].a, samechroma_lines[j].b)) * inverse_color_scalefactors[j];
                   proc_samechroma_lines[j].bs = (samechroma_lines[j].b * color_scalefactors[j]);
                   proc_samechroma_lines[j].bis = (samechroma_lines[j].b * inverse_color_scalefactors[j]);
-  
+
                   separate_red_lines[j].a = averages[j].yzw;
                   if (dot(directions_gba[j], directions_gba[j]) == 0.0f)
                       separate_red_lines[j].b = normalize(one3f);
                   else
                       separate_red_lines[j].b = normalize(directions_gba[j]);
-  
+
                   separate_green_lines[j].a = averages[j].xzw;
                   if (dot(directions_rba[j], directions_rba[j]) == 0.0f)
                       separate_green_lines[j].b = normalize(one3f);
                   else
                       separate_green_lines[j].b = normalize(directions_rba[j]);
-  
+
                   separate_blue_lines[j].a = averages[j].xyw;
                   if (dot(directions_rga[j], directions_rga[j]) == 0.0f)
                       separate_blue_lines[j].b = normalize(one3f);
                   else
                       separate_blue_lines[j].b = normalize(directions_rga[j]);
-  
+
                   separate_alpha_lines[j].a = averages[j].xyz;
                   if (dot(directions_rgb[j], directions_rgb[j]) == 0.0f)
                   {
@@ -11597,27 +11570,27 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   }
                   else
                       separate_alpha_lines[j].b = normalize(directions_rgb[j]);
-  
+
                   proc_separate_red_lines[j].amod = (separate_red_lines[j].a - separate_red_lines[j].b * dot(separate_red_lines[j].a, separate_red_lines[j].b)) * inverse_color_scalefactors[j].yzw;
                   proc_separate_red_lines[j].bs = (separate_red_lines[j].b * color_scalefactors[j].yzw);
                   proc_separate_red_lines[j].bis = (separate_red_lines[j].b * inverse_color_scalefactors[j].yzw);
-  
+
                   proc_separate_green_lines[j].amod =
                       (separate_green_lines[j].a - separate_green_lines[j].b * dot(separate_green_lines[j].a, separate_green_lines[j].b)) * inverse_color_scalefactors[j].xzw;
                   proc_separate_green_lines[j].bs = (separate_green_lines[j].b * color_scalefactors[j].xzw);
                   proc_separate_green_lines[j].bis = (separate_green_lines[j].b * inverse_color_scalefactors[j].xzw);
-  
+
                   proc_separate_blue_lines[j].amod = (separate_blue_lines[j].a - separate_blue_lines[j].b * dot(separate_blue_lines[j].a, separate_blue_lines[j].b)) * inverse_color_scalefactors[j].xyw;
                   proc_separate_blue_lines[j].bs = (separate_blue_lines[j].b * color_scalefactors[j].xyw);
                   proc_separate_blue_lines[j].bis = (separate_blue_lines[j].b * inverse_color_scalefactors[j].xyw);
-  
+
                   proc_separate_alpha_lines[j].amod =
                       (separate_alpha_lines[j].a - separate_alpha_lines[j].b * dot(separate_alpha_lines[j].a, separate_alpha_lines[j].b)) * inverse_color_scalefactors[j].xyz;
                   proc_separate_alpha_lines[j].bs = (separate_alpha_lines[j].b * color_scalefactors[j].xyz);
                   proc_separate_alpha_lines[j].bis = (separate_alpha_lines[j].b * inverse_color_scalefactors[j].xyz);
-  
+
               }
-  
+
               float uncorr_error = compute_error_squared_rgba(
                   &ASTCEncode->partition_tables[partition_count][partition],
                                                               pb,
@@ -11630,52 +11603,52 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                                                                   ewb,
                                                                   proc_samechroma_lines,
                                                                   samechroma_linelengths);
- 
+
             float separate_red_error  = compute_error_squared_gba(
                 &ASTCEncode->partition_tables[partition_count][partition],
                                                                  pb,
                                                                  ewb,
                                                                  proc_separate_red_lines,
                                                                  separate_red_linelengths);
-            
+
             float separate_green_error = compute_error_squared_rba(
                 &ASTCEncode->partition_tables[partition_count][partition],
                                                                    pb,
                                                                    ewb,
                                                                    proc_separate_green_lines,
                                                                    separate_green_linelengths);
-            
+
             float separate_blue_error = compute_error_squared_rga(
                 &ASTCEncode->partition_tables[partition_count][partition],
                                                                   pb,
                                                                   ewb,
                                                                   proc_separate_blue_lines,
                                                                   separate_blue_linelengths);
-            
+
             float separate_alpha_error = compute_error_squared_rgb(
                 &ASTCEncode->partition_tables[partition_count][partition],
                                                                    pb,
                                                                    ewb,
                                                                    proc_separate_alpha_lines,
                                                                    separate_alpha_linelengths);
- 
+
              // compute minimum & maximum alpha values in each partition
              float red_min[4], red_max[4];
              float green_min[4], green_max[4];
              float blue_min[4], blue_max[4];
              float alpha_min[4], alpha_max[4];
-             compute_alpha_minmax( 
-                 &ASTCEncode->partition_tables[partition_count][partition], 
+             compute_alpha_minmax(
+                 &ASTCEncode->partition_tables[partition_count][partition],
                  pb, ewb, alpha_min, alpha_max, ASTCEncode);
-  
+
               compute_rgb_minmax(
-                  &ASTCEncode->partition_tables[partition_count][partition], 
+                  &ASTCEncode->partition_tables[partition_count][partition],
                   pb, ewb, red_min, red_max, green_min, green_max, blue_min, blue_max, ASTCEncode);
-  
-              /* 
+
+              /*
                  Compute an estimate of error introduced by weight quantization imprecision.
-                 This error is computed as follows, for each partition 
-                 1: compute the principal-axis vector (full length) in error-space 
+                 This error is computed as follows, for each partition
+                 1: compute the principal-axis vector (full length) in error-space
                  2: convert the principal-axis vector to regular RGB-space
                  3: scale the vector by a constant that estimates average quantization error
                  4: for each texel, square the vector, then do a dot-product with the texel's error weight;
@@ -11683,35 +11656,35 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                  4(optimized): square the vector once, then do a dot-product with the average texel error,
                     then multiply by the number of texels.
                */
-  
+
               for (j = 0; j < partition_count; j++)
               {
                   float tpp = (float)(ASTCEncode->partition_tables[partition_count][partition].texels_per_partition[j]);
-  
+
                   float4 ics = inverse_color_scalefactors[j];
                   float4 error_weights = error_weightings[j] * (tpp * weight_imprecision_estim_squared);
-  
+
                   float4 uncorr_vector = (uncorr_lines[j].b * uncorr_linelengths[j]) * ics;
                   float4 samechroma_vector = (samechroma_lines[j].b * samechroma_linelengths[j]) * ics;
                   float3 separate_red_vector = (separate_red_lines[j].b * separate_red_linelengths[j]) * ics.yzw;
                   float3 separate_green_vector = (separate_green_lines[j].b * separate_green_linelengths[j]) * ics.xzw;
                   float3 separate_blue_vector = (separate_blue_lines[j].b * separate_blue_linelengths[j]) * ics.xyw;
                   float3 separate_alpha_vector = (separate_alpha_lines[j].b * separate_alpha_linelengths[j]) * ics.xyz;
-  
+
                   uncorr_vector = uncorr_vector * uncorr_vector;
                   samechroma_vector = samechroma_vector * samechroma_vector;
                   separate_red_vector = separate_red_vector * separate_red_vector;
                   separate_green_vector = separate_green_vector * separate_green_vector;
                   separate_blue_vector = separate_blue_vector * separate_blue_vector;
                   separate_alpha_vector = separate_alpha_vector * separate_alpha_vector;
-  
+
                   uncorr_error += dot(uncorr_vector, error_weights);
                   samechroma_error += dot(samechroma_vector, error_weights);
                   separate_red_error += dot(separate_red_vector, error_weights.yzw);
                   separate_green_error += dot(separate_green_vector, error_weights.xzw);
                   separate_blue_error += dot(separate_blue_vector, error_weights.xyw);
                   separate_alpha_error += dot(separate_alpha_vector, error_weights.xyz);
-  
+
                   float red_scalar = (red_max[j] - red_min[j]);
                   float green_scalar = (green_max[j] - green_min[j]);
                   float blue_scalar = (blue_max[j] - blue_min[j]);
@@ -11725,14 +11698,14 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   separate_blue_error += blue_scalar * error_weights.z;
                   separate_alpha_error += alpha_scalar * error_weights.w;
               }
-  
+
               uncorr_errors[i] = uncorr_error;
               samechroma_errors[i] = samechroma_error;
               separate_red_errors[i] = separate_red_error;
               separate_green_errors[i] = separate_green_error;
               separate_blue_errors[i] = separate_blue_error;
               separate_alpha_errors[i] = separate_alpha_error;
-  
+
           }
       }
       else
@@ -11740,13 +11713,13 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
 
           for (i = 0; i < PARTITION_COUNT; i++)
           {
-  
+
               int partition = partition_sequence[i];
-  
+
               int bk_partition_count = ASTCEncode->partition_tables[partition_count][partition].partition_count;
               if (bk_partition_count < partition_count)
               {
-  
+
                   uncorr_errors[i] = FLOAT_35;
                   samechroma_errors[i] = FLOAT_35;
                   separate_red_errors[i] = FLOAT_35;
@@ -11754,12 +11727,12 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   separate_blue_errors[i] = FLOAT_35;
                   continue;
               }
- 
+
               // the sentinel value for valid partitions above the search limit must be smaller
               // than the sentinel value for invalid partitions
               if (i >= partition_search_limit)
               {
-  
+
                   defacto_search_limit = i;
                   uncorr_errors[i] = FLOAT_34;
                   samechroma_errors[i] = FLOAT_34;
@@ -11767,19 +11740,19 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   separate_green_errors[i] = FLOAT_34;
                   separate_blue_errors[i] = FLOAT_34;
                   break;
-  
+
               }
-  
+
               // compute the weighting to give to each color channel
               // in each partition.
               float4 error_weightings[4];
               float4 color_scalefactors[4];
               float4 inverse_color_scalefactors[4];
-  
-              compute_partition_error_color_weightings( ewb, 
+
+              compute_partition_error_color_weightings( ewb,
                   &ASTCEncode->partition_tables[partition_count][partition],
                   error_weightings, color_scalefactors, ASTCEncode);
-  
+
               for (j = 0; j < partition_count; j++)
               {
                   inverse_color_scalefactors[j].x = 1.0f / max(color_scalefactors[j].x, FLOAT_n7);
@@ -11787,7 +11760,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   inverse_color_scalefactors[j].z = 1.0f / max(color_scalefactors[j].z, FLOAT_n7);
                   inverse_color_scalefactors[j].w = 1.0f / max(color_scalefactors[j].w, FLOAT_n7);
               }
-  
+
               float3 averages[4];
               float3 directions_rgb[4];
               float2 directions_rg[4];
@@ -11803,24 +11776,24 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
               line2 separate_red_lines[4];
               line2 separate_green_lines[4];
               line2 separate_blue_lines[4];
-  
+
               processed_line3 proc_uncorr_lines[4];
               processed_line3 proc_samechroma_lines[4];
-  
+
               processed_line2 proc_separate_red_lines[4];
               processed_line2 proc_separate_green_lines[4];
               processed_line2 proc_separate_blue_lines[4];
-  
+
               float uncorr_linelengths[4];
               float samechroma_linelengths[4];
               float separate_red_linelengths[4];
               float separate_green_linelengths[4];
               float separate_blue_linelengths[4];
- 
+
               float2 one2f  = { 1.0f,1.0f };
               float3 one3f  = { 1.0f,1.0f,1.0f };
               float3 zero3f = { 0.0f,0.0f,0.0f };
-  
+
               for (j = 0; j < partition_count; j++)
               {
                   uncorr_lines[j].a = averages[j];
@@ -11828,54 +11801,54 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                       uncorr_lines[j].b = normalize(one3f);
                   else
                       uncorr_lines[j].b = normalize(directions_rgb[j]);
-  
-  
+
+
                   samechroma_lines[j].a = zero3f;
-  
+
                   if (dot(averages[j], averages[j]) == 0.0f)
                       samechroma_lines[j].b = normalize(one3f);
                   else
                       samechroma_lines[j].b = normalize(averages[j]);
-  
+
                   proc_uncorr_lines[j].amod = (uncorr_lines[j].a - uncorr_lines[j].b * dot(uncorr_lines[j].a, uncorr_lines[j].b)) * inverse_color_scalefactors[j].xyz;
                   proc_uncorr_lines[j].bs = (uncorr_lines[j].b * color_scalefactors[j].xyz);
                   proc_uncorr_lines[j].bis = (uncorr_lines[j].b * inverse_color_scalefactors[j].xyz);
-  
+
                   proc_samechroma_lines[j].amod = (samechroma_lines[j].a - samechroma_lines[j].b * dot(samechroma_lines[j].a, samechroma_lines[j].b)) * inverse_color_scalefactors[j].xyz;
                   proc_samechroma_lines[j].bs = (samechroma_lines[j].b * color_scalefactors[j].xyz);
                   proc_samechroma_lines[j].bis = (samechroma_lines[j].b * inverse_color_scalefactors[j].xyz);
-  
+
                   separate_red_lines[j].a = averages[j].yz;
                   if (dot(directions_gb[j], directions_gb[j]) == 0.0f)
                       separate_red_lines[j].b = normalize(one2f);
                   else
                       separate_red_lines[j].b = normalize(directions_gb[j]);
-  
+
                   separate_green_lines[j].a = averages[j].xz;
                   if (dot(directions_rb[j], directions_rb[j]) == 0.0f)
                       separate_green_lines[j].b = normalize(one2f);
                   else
                       separate_green_lines[j].b = normalize(directions_rb[j]);
-  
+
                   separate_blue_lines[j].a = averages[j].xy;
                   if (dot(directions_rg[j], directions_rg[j]) == 0.0f)
                       separate_blue_lines[j].b = normalize(one2f);
                   else
                       separate_blue_lines[j].b = normalize(directions_rg[j]);
-  
+
                   proc_separate_red_lines[j].amod = (separate_red_lines[j].a - separate_red_lines[j].b * dot(separate_red_lines[j].a, separate_red_lines[j].b)) * inverse_color_scalefactors[j].yz;
                   proc_separate_red_lines[j].bs = (separate_red_lines[j].b * color_scalefactors[j].yz);
                   proc_separate_red_lines[j].bis = (separate_red_lines[j].b * inverse_color_scalefactors[j].yz);
-  
+
                   proc_separate_green_lines[j].amod =
                       (separate_green_lines[j].a - separate_green_lines[j].b * dot(separate_green_lines[j].a, separate_green_lines[j].b)) * inverse_color_scalefactors[j].xz;
                   proc_separate_green_lines[j].bs = (separate_green_lines[j].b * color_scalefactors[j].xz);
                   proc_separate_green_lines[j].bis = (separate_green_lines[j].b * inverse_color_scalefactors[j].xz);
-  
+
                   proc_separate_blue_lines[j].amod = (separate_blue_lines[j].a - separate_blue_lines[j].b * dot(separate_blue_lines[j].a, separate_blue_lines[j].b)) * inverse_color_scalefactors[j].xy;
                   proc_separate_blue_lines[j].bs = (separate_blue_lines[j].b * color_scalefactors[j].xy);
                   proc_separate_blue_lines[j].bis = (separate_blue_lines[j].b * inverse_color_scalefactors[j].xy);
-  
+
               }
 
               float uncorr_error = compute_error_squared_rgb(
@@ -11890,21 +11863,21 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                                                                  ewb,
                                                                  proc_samechroma_lines,
                                                                  samechroma_linelengths);
- 
+
               float separate_red_error = compute_error_squared_gb(
                   &ASTCEncode->partition_tables[partition_count][partition],
                                                                   pb,
                                                                   ewb,
                                                                   proc_separate_red_lines,
                                                                   separate_red_linelengths);
- 
+
               float separate_green_error = compute_error_squared_rb(
                   &ASTCEncode->partition_tables[partition_count][partition],
                                                                     pb,
                                                                     ewb,
                                                                     proc_separate_green_lines,
                                                                     separate_green_linelengths);
-   
+
               float separate_blue_error = compute_error_squared_rg(
                   &ASTCEncode->partition_tables[partition_count][partition],
                                                                    pb,
@@ -11920,9 +11893,9 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   &ASTCEncode->partition_tables[partition_count][partition],
                   pb, ewb, red_min, red_max, green_min, green_max, blue_min, blue_max, ASTCEncode);
 
-              /* 
+              /*
                  compute an estimate of error introduced by weight imprecision.
-                 This error is computed as follows, for each partition 
+                 This error is computed as follows, for each partition
                  1: compute the principal-axis vector (full length) in error-space
                  2: convert the principal-axis vector to regular RGB-space
                  3: scale the vector by a constant that estimates average quantization error.
@@ -11935,37 +11908,37 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
               for (j = 0; j < partition_count; j++)
               {
                   float tpp = (float)(ASTCEncode->partition_tables[partition_count][partition].texels_per_partition[j]);
-  
+
                   float3 ics = inverse_color_scalefactors[j].xyz;
                   float3 error_weights = error_weightings[j].xyz * (tpp * weight_imprecision_estim_squared);
-  
+
                   float3 uncorr_vector = (uncorr_lines[j].b * uncorr_linelengths[j]) * ics;
                   float3 samechroma_vector = (samechroma_lines[j].b * samechroma_linelengths[j]) * ics;
-  
+
                   float2 separate_red_vector = (separate_red_lines[j].b * separate_red_linelengths[j]) * ics.yz;
                   float2 separate_green_vector = (separate_green_lines[j].b * separate_green_linelengths[j]) * ics.xz;
                   float2 separate_blue_vector = (separate_blue_lines[j].b * separate_blue_linelengths[j]) * ics.xy;
-  
+
                   uncorr_vector = uncorr_vector * uncorr_vector;
                   samechroma_vector = samechroma_vector * samechroma_vector;
                   separate_red_vector = separate_red_vector * separate_red_vector;
                   separate_green_vector = separate_green_vector * separate_green_vector;
                   separate_blue_vector = separate_blue_vector * separate_blue_vector;
-  
+
                   uncorr_error += dot(uncorr_vector, error_weights);
                   samechroma_error += dot(samechroma_vector, error_weights);
                   separate_red_error += dot(separate_red_vector, error_weights.yz);
                   separate_green_error += dot(separate_green_vector, error_weights.xz);
                   separate_blue_error += dot(separate_blue_vector, error_weights.xy);
-  
+
                   float red_scalar = (red_max[j] - red_min[j]);
                   float green_scalar = (green_max[j] - green_min[j]);
                   float blue_scalar = (blue_max[j] - blue_min[j]);
-  
+
                   red_scalar *= red_scalar;
                   green_scalar *= green_scalar;
                   blue_scalar *= blue_scalar;
-  
+
                   separate_red_error += red_scalar * error_weights.x;
                   separate_green_error += green_scalar * error_weights.y;
                   separate_blue_error += blue_scalar * error_weights.z;
@@ -11973,7 +11946,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
 
               uncorr_errors[i] = uncorr_error;
               samechroma_errors[i] = samechroma_error;
-  
+
               separate_red_errors[i] = separate_red_error;
               separate_green_errors[i] = separate_green_error;
               separate_blue_errors[i] = separate_blue_error;
@@ -11997,7 +11970,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
           best_partitions_uncorrellated[i] = partition_sequence[best_uncorr_partition];
           uncorr_errors[best_uncorr_partition] = FLOAT_30;
           samechroma_errors[best_uncorr_partition] = FLOAT_30;
-  
+
           for (j = 0; j <= defacto_search_limit; j++)
           {
               if (samechroma_errors[j] < best_samechroma_error)
@@ -12015,7 +11988,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
       {
           int best_partition = 0;
           float best_partition_error = FLOAT_30;
-  
+
           for (j = 0; j < defacto_search_limit; j++)
           {
 
@@ -12044,7 +12017,7 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
                   }
               }
           }
-  
+
           separate_errors[best_partition] = FLOAT_30;
           best_partition = ((best_partition >> PARTITION_BITS) << PARTITION_BITS) | partition_sequence[best_partition & (PARTITION_COUNT - 1)];
           best_partitions_dual_weight_planes[i] = best_partition;
@@ -12053,9 +12026,9 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
 }
 
 float compress_symbolic_block(
-     imageblock * blk, 
+     imageblock * blk,
      symbolic_compressed_block * scb,
-     __global ASTC_Encode *  ASTCEncode
+      ASTC_Encode *  ASTCEncode
      )
 {
       DEBUG("compress_symbolic_block");
@@ -12070,16 +12043,16 @@ float compress_symbolic_block(
       endpoints_and_weights eix1[MAX_DECIMATION_MODES];
       endpoints_and_weights eix2[MAX_DECIMATION_MODES];
 
-      __global2 float   *decimated_weights                           = ASTCEncode->decimated_weights;
-      __global2 uint8_t *u8_quantized_decimated_quantized_weights    = ASTCEncode->u8_quantized_decimated_quantized_weights;
-      __global2 float   *decimated_quantized_weights                 = ASTCEncode->decimated_quantized_weights;
-      __global2 float   *flt_quantized_decimated_quantized_weights   = ASTCEncode->flt_quantized_decimated_quantized_weights;
+      float   *decimated_weights                           = ASTCEncode->decimated_weights;
+      uint8_t *u8_quantized_decimated_quantized_weights    = ASTCEncode->u8_quantized_decimated_quantized_weights;
+      float   *decimated_quantized_weights                 = ASTCEncode->decimated_quantized_weights;
+      float   *flt_quantized_decimated_quantized_weights   = ASTCEncode->flt_quantized_decimated_quantized_weights;
 
       if (blk->red_min == blk->red_max && blk->green_min == blk->green_max && blk->blue_min == blk->blue_max && blk->alpha_min == blk->alpha_max)
       {
            // detected a constant-color block. Encode as FP16 if using HDR
            scb->error_block = 0;
-    
+
             if (ASTCEncode->m_rgb_force_use_of_hdr)
             {
                 scb->block_mode = -1;
@@ -12150,12 +12123,12 @@ float compress_symbolic_block(
     for (i = 0; i < 2; i++)
     {
         compress_symbolic_block_fixed_partition_1_plane(
-                                                  modecutoffs[i], 
+                                                  modecutoffs[i],
                                                   ASTCEncode->m_ewp.max_refinement_iters,
                                                   1,    // partition count
                                                   0,    // partition indexdone
-                                                  blk, 
-                                                  &ewb, 
+                                                  blk,
+                                                  &ewb,
                                                   tempblocks,
                                                   &ei1,
                                                   eix1,
@@ -12213,13 +12186,13 @@ float compress_symbolic_block(
         if (!uses_alpha && i == 3)
             continue;
 
-        compress_symbolic_block_fixed_partition_2_planes(  mode_cutoff, 
+        compress_symbolic_block_fixed_partition_2_planes(  mode_cutoff,
                                                            ASTCEncode->m_ewp.max_refinement_iters,
                                                            1,    // partition count
                                                            0,    // partition index
                                                            i,    // the color component to test a separate plane of weights for.
-                                                           blk, 
-                                                           &ewb, 
+                                                           blk,
+                                                           &ewb,
                                                            tempblocks,
                                                            &ei1,
                                                            &ei2,
@@ -12277,18 +12250,18 @@ float compress_symbolic_block(
         int partition_indices_2planes[2];
 
         find_best_partitionings(ASTCEncode->m_ewp.partition_search_limit,
-                                partition_count, blk, &ewb, 1, 
+                                partition_count, blk, &ewb, 1,
                                 &(partition_indices_1plane[0]), &(partition_indices_1plane[1]), &(partition_indices_2planes[0]),ASTCEncode);
 
         for (i = 0; i < 2; i++)
         {
             compress_symbolic_block_fixed_partition_1_plane(
-                                        mode_cutoff, 
+                                        mode_cutoff,
                                         ASTCEncode->m_ewp.max_refinement_iters,
-                                        partition_count, 
-                                        partition_indices_1plane[i], 
-                                        blk, 
-                                        &ewb, 
+                                        partition_count,
+                                        partition_indices_1plane[i],
+                                        blk,
+                                        &ewb,
                                         tempblocks,
                                         &ei1,
                                         eix1,
@@ -12340,16 +12313,16 @@ float compress_symbolic_block(
         {
             if (lowest_correl > ASTCEncode->m_ewp.lowest_correlation_cutoff)
                 continue;
-            
+
 
             compress_symbolic_block_fixed_partition_2_planes(
                                                              mode_cutoff,
                                                              ASTCEncode->m_ewp.max_refinement_iters,
                                                              partition_count,
-                                                             (partition_indices_2planes[i] & (PARTITION_COUNT - 1)), 
+                                                             (partition_indices_2planes[i] & (PARTITION_COUNT - 1)),
                                                               (partition_indices_2planes[i] >> PARTITION_BITS),
-                                                             blk, 
-                                                              &ewb, 
+                                                             blk,
+                                                              &ewb,
                                                               tempblocks,
                                                              &ei1,
                                                              &ei2,
@@ -12361,8 +12334,8 @@ float compress_symbolic_block(
                                                              flt_quantized_decimated_quantized_weights,
                                                              ASTCEncode
                                                              );
-            
-             
+
+
            best_errorval_in_mode = FLOAT_30;
            for (j = 0; j < 4; j++)
            {
@@ -12401,7 +12374,7 @@ float compress_symbolic_block(
 //===================== SYMBOLIC TO PHYSICAL START =============================
 
 // routine to write up to 8 bits
-//static inline 
+//static inline
 void write_bits(int value, int bitcount, int bitoffset, uint8_t * ptr)
 {
     int mask = (1 << bitcount) - 1;
@@ -12570,7 +12543,7 @@ static void encode_ise(int quantization_level, int elements, uint8_t * input_dat
     }
 }
 
-physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, __global ASTC_Encode *  ASTCEncode)
+physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc,  ASTC_Encode *  ASTCEncode)
 {
     int i, j;
     physical_compressed_block res;

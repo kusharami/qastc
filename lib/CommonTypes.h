@@ -25,6 +25,7 @@
 #define COMMONTYPES_H
 
 #include <cstdint>
+#include <cstddef>
 
 namespace CMP
 {

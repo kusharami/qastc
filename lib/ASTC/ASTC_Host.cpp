@@ -22,12 +22,13 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <cmath>
 
 //================================= ASTC CPU HOST CODE  ===========================================
 
 namespace ASTC_Encoder
 {
-static __constant float percentile_table_4x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.8661f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -285,7 +286,7 @@ static __constant float percentile_table_4x4[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_4x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.8886f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -543,7 +544,7 @@ static __constant float percentile_table_4x5[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_4x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.7443f, 0.8512f, 1.0000f, 1.0000f, 1.0000f,
 	0.8929f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -801,7 +802,7 @@ static __constant float percentile_table_4x6[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_4x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.6540f,
 	0.8090f, 1.0000f, 1.0000f, 0.9047f, 0.9767f, 1.0000f, 1.0000f, 1.0000f,
 	0.9273f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.6869f, 0.8003f,
@@ -1059,7 +1060,7 @@ static __constant float percentile_table_4x8[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_4x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.8566f,
 	0.9251f, 1.0000f, 1.0000f, 0.9271f, 0.9827f, 1.0000f, 1.0000f, 1.0000f,
 	0.9436f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.8821f, 0.9344f,
@@ -1317,7 +1318,7 @@ static __constant float percentile_table_4x10[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_4x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_4x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.8570f,
 	0.9351f, 1.0000f, 1.0000f, 0.9461f, 0.9884f, 1.0000f, 1.0000f, 1.0000f,
 	0.9476f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.8944f, 0.9376f,
@@ -1575,7 +1576,7 @@ static __constant float percentile_table_4x12[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_5x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_5x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9496f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -1833,7 +1834,7 @@ static __constant float percentile_table_5x4[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_5x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_5x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9673f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -2091,7 +2092,7 @@ static __constant float percentile_table_5x5[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_5x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_5x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.7676f, 0.8675f, 1.0000f, 1.0000f, 1.0000f,
 	0.9864f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
@@ -2349,7 +2350,7 @@ static __constant float percentile_table_5x6[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_5x8[2048] = {
+static const float percentile_table_5x8[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -4400,7 +4401,7 @@ static __constant float percentile_table_5x8[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_5x10[2048] = {
+static const float percentile_table_5x10[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -6451,7 +6452,7 @@ static __constant float percentile_table_5x10[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_5x12[2048] = {
+static const float percentile_table_5x12[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -8502,7 +8503,7 @@ static __constant float percentile_table_5x12[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_6x4[2048] = {
+static const float percentile_table_6x4[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -10553,7 +10554,7 @@ static __constant float percentile_table_6x4[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_6x5[2048] = {
+static const float percentile_table_6x5[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -12604,7 +12605,7 @@ static __constant float percentile_table_6x5[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_6x6[2048] = {
+static const float percentile_table_6x6[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -14655,7 +14656,7 @@ static __constant float percentile_table_6x6[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_6x8[2048] = {
+static const float percentile_table_6x8[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -16706,7 +16707,7 @@ static __constant float percentile_table_6x8[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_6x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_6x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.9113f,
 	0.9605f, 1.0000f, 1.0000f, 0.9651f, 0.9905f, 1.0000f, 1.0000f, 1.0000f,
 	0.9986f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 0.9297f, 0.9572f,
@@ -16964,7 +16965,7 @@ static __constant float percentile_table_6x10[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_6x12[2048] = {
+static const float percentile_table_6x12[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -19015,7 +19016,7 @@ static __constant float percentile_table_6x12[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_8x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.5963f, 0.7486f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9848f, 1.0000f, 0.6398f, 0.7224f, 0.8643f, 1.0000f, 1.0000f, 1.0000f,
@@ -19273,7 +19274,7 @@ static __constant float percentile_table_8x4[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_8x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.6120f, 0.7696f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9884f, 1.0000f, 0.6510f, 0.7169f, 0.8592f, 1.0000f, 1.0000f, 1.0000f,
@@ -19531,7 +19532,7 @@ static __constant float percentile_table_8x5[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_8x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.6348f, 0.7860f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8285f, 0.9042f, 1.0000f, 1.0000f, 1.0000f,
 	0.9940f, 1.0000f, 0.6847f, 0.7223f, 0.8700f, 1.0000f, 1.0000f, 1.0000f,
@@ -19789,7 +19790,7 @@ static __constant float percentile_table_8x6[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_8x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.6539f, 0.8057f, 1.0000f, 1.0000f, 0.8190f,
 	0.8664f, 1.0000f, 1.0000f, 0.9665f, 0.9926f, 1.0000f, 1.0000f, 1.0000f,
 	0.9969f, 1.0000f, 0.7563f, 0.7444f, 0.8563f, 1.0000f, 0.8161f, 0.8706f,
@@ -20047,7 +20048,7 @@ static __constant float percentile_table_8x8[2048] = { 1.0000f, 1.0000f, 1.0000f
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_8x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8029f, 0.8183f, 1.0000f, 1.0000f, 0.9742f,
 	0.9767f, 1.0000f, 1.0000f, 0.9905f, 0.9983f, 1.0000f, 1.0000f, 1.0000f,
 	0.9980f, 1.0000f, 0.7921f, 0.8421f, 0.8718f, 1.0000f, 0.9775f, 0.9700f,
@@ -20305,7 +20306,7 @@ static __constant float percentile_table_8x10[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_8x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_8x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8054f, 0.8341f, 1.0000f, 1.0000f, 0.9810f,
 	0.9675f, 1.0000f, 1.0000f, 0.9943f, 0.9994f, 1.0000f, 1.0000f, 1.0000f,
 	0.9986f, 1.0000f, 0.8624f, 0.8820f, 0.8375f, 1.0000f, 0.9572f, 0.9701f,
@@ -20563,7 +20564,7 @@ static __constant float percentile_table_8x12[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8283f, 0.9411f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9911f, 1.0000f, 0.8198f, 0.8943f, 0.9580f, 1.0000f, 1.0000f, 1.0000f,
@@ -20821,7 +20822,7 @@ static __constant float percentile_table_10x4[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8462f, 0.9403f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9942f, 1.0000f, 0.8593f, 0.9155f, 0.9673f, 1.0000f, 1.0000f, 1.0000f,
@@ -21079,7 +21080,7 @@ static __constant float percentile_table_10x5[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x6[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8941f, 0.9467f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.8379f, 0.9490f, 1.0000f, 1.0000f, 1.0000f,
 	0.9941f, 1.0000f, 0.8989f, 0.9438f, 0.9693f, 1.0000f, 1.0000f, 1.0000f,
@@ -21337,7 +21338,7 @@ static __constant float percentile_table_10x6[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x8[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.9515f, 0.9479f, 1.0000f, 1.0000f, 0.8697f,
 	0.8771f, 1.0000f, 1.0000f, 0.9852f, 0.9958f, 1.0000f, 1.0000f, 1.0000f,
 	0.9911f, 1.0000f, 0.9611f, 0.9295f, 0.9716f, 1.0000f, 0.8951f, 0.9092f,
@@ -21595,7 +21596,7 @@ static __constant float percentile_table_10x8[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x10[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.9686f, 0.9633f, 1.0000f, 1.0000f, 0.9876f,
 	0.9703f, 1.0000f, 1.0000f, 0.9951f, 0.9984f, 1.0000f, 1.0000f, 1.0000f,
 	0.9987f, 1.0000f, 0.9597f, 0.9643f, 0.9819f, 1.0000f, 0.9912f, 0.9804f,
@@ -21853,7 +21854,7 @@ static __constant float percentile_table_10x10[2048] = { 1.0000f, 1.0000f, 1.000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_10x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_10x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 0.9716f, 0.9549f, 1.0000f, 1.0000f, 0.9881f,
 	0.9817f, 1.0000f, 1.0000f, 0.9984f, 0.9983f, 1.0000f, 1.0000f, 1.0000f,
 	0.9997f, 1.0000f, 0.9617f, 0.9697f, 0.9825f, 1.0000f, 0.9916f, 0.9941f,
@@ -22111,7 +22112,7 @@ static __constant float percentile_table_10x12[2048] = { 1.0000f, 1.0000f, 1.000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_12x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_12x4[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 0.3987f, 1.0000f, 0.8105f, 0.9465f, 0.6269f, 1.0000f, 1.0000f,
 	1.0000f, 0.4786f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9946f, 0.4927f, 0.8691f, 0.9409f, 0.9569f, 0.6578f, 1.0000f, 1.0000f,
@@ -22369,7 +22370,7 @@ static __constant float percentile_table_12x4[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_12x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_12x5[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 0.3385f, 1.0000f, 0.8818f, 0.9311f, 0.6057f, 1.0000f, 1.0000f,
 	1.0000f, 0.4810f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	0.9964f, 0.5033f, 0.8904f, 0.9448f, 0.9478f, 0.6751f, 1.0000f, 1.0000f,
@@ -22627,7 +22628,7 @@ static __constant float percentile_table_12x5[2048] = { 1.0000f, 1.0000f, 1.0000
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 1.0000f, 1.0000f, 1.0000f, 1.0000f };
 
-static __constant float percentile_table_12x6[2048] = {
+static const float percentile_table_12x6[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -24678,7 +24679,7 @@ static __constant float percentile_table_12x6[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_12x8[2048] = {
+static const float percentile_table_12x8[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -26729,7 +26730,7 @@ static __constant float percentile_table_12x8[2048] = {
 	1.0000f,
 };
 
-static __constant float percentile_table_12x10[2048] = {
+static const float percentile_table_12x10[2048] = {
 	1.0000f,
 	1.0000f,
 	1.0000f,
@@ -28780,7 +28781,7 @@ static __constant float percentile_table_12x10[2048] = {
 	1.0000f
 };
 
-static __constant float percentile_table_12x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
+static const float percentile_table_12x12[2048] = { 1.0000f, 1.0000f, 1.0000f,
 	1.0000f, 0.6459f, 1.0000f, 0.9751f, 0.9422f, 0.8309f, 1.0000f, 0.9931f,
 	0.9934f, 0.5189f, 1.0000f, 0.9984f, 0.9983f, 1.0000f, 1.0000f, 1.0000f,
 	0.9999f, 0.8017f, 0.9895f, 0.9892f, 0.9881f, 0.7254f, 0.9869f, 0.9932f,
@@ -29186,7 +29187,7 @@ void initialize_decimation_table_3d(
 				weight[2] = w2;
 				weight[3] = w3;
 
-				/*
+                /*
                 for(i=0;i<4;i++) weight[i] <<= 4; */
 
 				for (i = 0; i < 4; i++)
@@ -29918,7 +29919,7 @@ static int select_partition_host(
 
 static void generate_one_partition_table(
 	int partition_count, int partition_index, partition_info *pt,
-	__global ASTC_Encode *ASTCEncode)
+	 ASTC_Encode *ASTCEncode)
 {
 	int xdim = ASTCEncode->m_xdim;
 	int ydim = ASTCEncode->m_ydim;
@@ -29985,12 +29986,12 @@ static void generate_one_partition_table(
 }
 
 static partition_info **generate_partition_tables(
-	__global ASTC_Encode *ASTCEncode)
+	 ASTC_Encode *ASTCEncode)
 {
 	int xdim = ASTCEncode->m_xdim;
 	int ydim = ASTCEncode->m_ydim;
 	int zdim = ASTCEncode->m_zdim;
-	
+
 	partition_info *one_partition = new partition_info;
 	partition_info *two_partitions = new partition_info[PARTITION_COUNT];
 	partition_info *three_partitions = new partition_info[PARTITION_COUNT];
@@ -30002,7 +30003,7 @@ static partition_info **generate_partition_tables(
 	partition_table[2] = two_partitions;
 	partition_table[3] = three_partitions;
 	partition_table[4] = four_partitions;
-	
+
 	int i;
 	generate_one_partition_table(1, 0, one_partition, ASTCEncode);
 	for (i = 0; i < PARTITION_COUNT; i++)
@@ -30017,7 +30018,7 @@ static partition_info **generate_partition_tables(
 		xdim, ydim, zdim, three_partitions);
 	partition_table_zap_equal_elements(
 		xdim, ydim, zdim, four_partitions);
-	
+
 	return partition_table;
 }
 
@@ -30025,7 +30026,7 @@ static std::mutex partition_tables_mutex;
 static partition_info **c_partition_tables[4096] = {NULL};
 
 static const partition_info *const * get_partition_tables(
-		__global ASTC_Encode *ASTCEncode)
+		 ASTC_Encode *ASTCEncode)
 {
 	int xdim = ASTCEncode->m_xdim;
 	int ydim = ASTCEncode->m_ydim;
@@ -30438,7 +30439,7 @@ static block_size_descriptor_cpu *get_block_size_descriptor_cpu(
 	if (bsd_pointers[bsd_index] == NULL)
 	{
 		std::lock_guard<std::mutex> lock(block_size_descriptor_mutex);
-		
+
 		block_size_descriptor_cpu *bsd = new block_size_descriptor_cpu;
 #ifdef ASTC_ENABLE_3D_SUPPORT
 		if (zdim > 1)
@@ -30453,7 +30454,7 @@ static block_size_descriptor_cpu *get_block_size_descriptor_cpu(
 }
 
 static void setup_block_size_descriptor(
-	__global ASTC_Encode *ASTCEncode)
+	 ASTC_Encode *ASTCEncode)
 {
 #ifdef ASTC_ENABLE_3D_SUPPORT
 	if (zdim > 1)
@@ -30605,7 +30606,7 @@ static void initialize_decimation_table_3d(
 				weight[2] = w2;
 				weight[3] = w3;
 
-				/*
+                /*
                 for(i=0;i<4;i++) weight[i] <<= 4; */
 
 				for (i = 0; i < 4; i++)
@@ -31166,7 +31167,7 @@ static void decode_ise(int quantization_level, int elements, const uint8_t *inpu
 }
 
 static void InitializeASTCSettingsForSetBlockSize(
-	__global ASTC_Encode *ASTCEncode)
+	 ASTC_Encode *ASTCEncode)
 {
 	int xdim_2d = ASTCEncode->m_xdim;
 	int ydim_2d = ASTCEncode->m_ydim;
@@ -31345,7 +31346,7 @@ static void init_ASTC_tables()
 	build_quantization_mode_table();
 }
 
-bool init_ASTC(__global ASTC_Encode *ASTCEncode)
+bool init_ASTC( ASTC_Encode *ASTCEncode)
 {
 	init_ASTC_tables();
 	InitializeASTCSettingsForSetBlockSize(ASTCEncode);
@@ -31761,7 +31762,7 @@ void fetch_imageblock_cpu(const astc_codec_image_cpu *img,
 	imageblock_cpu *pb, // picture-block to imitialize with image data
 	// position in texture.
 	int xpos, int ypos, int zpos,
-	__global ASTC_Encoder::ASTC_Encode *ASTCEncode)
+	 ASTC_Encoder::ASTC_Encode *ASTCEncode)
 {
 	float *fptr = pb->orig_data;
 	int xsize = img->xsize + 2 * img->padding;
@@ -31834,28 +31835,28 @@ void fetch_imageblock_cpu(const astc_codec_image_cpu *img,
 	//------------------------------------------
 	// HDR currently not supported in code
 	/*
-    else if (img->imagedata16)
-    {
-    for (z = 0; z < zdim; z++)
-    for (y = 0; y < ydim; y++)
-    for (x = 0; x < xdim; x++)
-    {
-    int xi = xpos + x;
-    int yi = ypos + y;
-    int zi = zpos + z;
-    // clamp XY coordinates to the picture.
-    if (xi < 0)
-    xi = 0;
-    if (yi < 0)
-    yi = 0;
-    if (zi < 0)
-    zi = 0;
-    if (xi >= xsize)
-    xi = xsize - 1;
-    if (yi >= ysize)
-    yi = ysize - 1;
-    if (zi >= ysize)
-    zi = zsize - 1;
+	else if (img->imagedata16)
+	{
+	for (z = 0; z < zdim; z++)
+	for (y = 0; y < ydim; y++)
+	for (x = 0; x < xdim; x++)
+	{
+	int xi = xpos + x;
+	int yi = ypos + y;
+	int zi = zpos + z;
+	// clamp XY coordinates to the picture.
+	if (xi < 0)
+	xi = 0;
+	if (yi < 0)
+	yi = 0;
+	if (zi < 0)
+	zi = 0;
+	if (xi >= xsize)
+	xi = xsize - 1;
+	if (yi >= ysize)
+	yi = ysize - 1;
+	if (zi >= ysize)
+	zi = zsize - 1;
 
     int r = img->imagedata16[zi][yi][4 * xi];
     int g = img->imagedata16[zi][yi][4 * xi + 1];
@@ -31888,7 +31889,7 @@ void fetch_imageblock_cpu(const astc_codec_image_cpu *img,
     }
     */
 
-	int pixelcount = xdim * ydim * zdim;
+    int pixelcount = xdim * ydim * zdim;
 
 	// impose the choice on every pixel when encoding.
 	for (i = 0; i < pixelcount; i++)
