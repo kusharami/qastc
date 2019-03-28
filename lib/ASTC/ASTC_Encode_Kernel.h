@@ -280,14 +280,6 @@ typedef struct
 	unsigned int m_width_in_blocks; //
 	unsigned int m_height_in_blocks; //
 
-	float decimated_weights[2 * MAX_DECIMATION_MODES * MAX_WEIGHTS_PER_BLOCK];
-	uint8_t u8_quantized_decimated_quantized_weights[2 * MAX_WEIGHT_MODES *
-		MAX_WEIGHTS_PER_BLOCK];
-	float decimated_quantized_weights[2 * MAX_DECIMATION_MODES *
-		MAX_WEIGHTS_PER_BLOCK];
-	float flt_quantized_decimated_quantized_weights[2 * MAX_WEIGHT_MODES *
-		MAX_WEIGHTS_PER_BLOCK];
-
 	// User settings
 	astc_decode_mode m_decode_mode;
 	error_weighting_params m_ewp;
@@ -295,6 +287,17 @@ typedef struct
 	float m_Quality;
 	const partition_info *const *partition_tables;
 } ASTC_Encode;
+
+struct compress_symbolic_block_buffers
+{
+	float decimated_weights[2 * MAX_DECIMATION_MODES * MAX_WEIGHTS_PER_BLOCK];
+	uint8_t u8_quantized_decimated_quantized_weights[2 * MAX_WEIGHT_MODES *
+		MAX_WEIGHTS_PER_BLOCK];
+	float decimated_quantized_weights[2 * MAX_DECIMATION_MODES *
+		MAX_WEIGHTS_PER_BLOCK];
+	float flt_quantized_decimated_quantized_weights[2 * MAX_WEIGHT_MODES *
+		MAX_WEIGHTS_PER_BLOCK];	
+};
 
 extern void imageblock_initialize_work_from_orig(
 	imageblock *pb, int pixelcount);
@@ -306,7 +309,8 @@ extern void decompress_symbolic_block(
 	symbolic_compressed_block *scb, imageblock *blk, ASTC_Encode *ASTCEncode);
 
 extern float compress_symbolic_block(
-	imageblock *blk, symbolic_compressed_block *scb, ASTC_Encode *ASTCEncode);
+	imageblock *blk, symbolic_compressed_block *scb, ASTC_Encode *ASTCEncode,
+		compress_symbolic_block_buffers *buffers);
 
 extern physical_compressed_block symbolic_to_physical(
 	symbolic_compressed_block *sc, ASTC_Encode *ASTCEncode);
