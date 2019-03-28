@@ -30399,6 +30399,7 @@ static void construct_block_size_descriptor_2d_cpu(
 
 	else
 	{
+		srand(555467);
 		// pick 64 random texels for use with bitmap partitioning.
 		int arr[MAX_TEXELS_PER_BLOCK];
 		for (i = 0; i < xdim * ydim; i++)
