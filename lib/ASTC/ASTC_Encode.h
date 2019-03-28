@@ -33,7 +33,8 @@ class ASTCBlockEncoder
 public:
 	// This routine compresses a block and returns the RMS error
 	static void CompressBlock_kernel(astc_codec_image *input_image, uint8_t *bp,
-		int x, int y, ASTC_Encoder::ASTC_Encode *ASTCEncode);
+		int x, int y, ASTC_Encoder::ASTC_Encode *ASTCEncode,
+		ASTC_Encoder::compress_symbolic_block_buffers *buffers);
 };
 
 #endif

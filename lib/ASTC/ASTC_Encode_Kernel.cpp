@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
@@ -12028,8 +12029,8 @@ static void find_best_partitionings(int partition_search_limit, int partition_co
 float compress_symbolic_block(
      imageblock * blk,
      symbolic_compressed_block * scb,
-      ASTC_Encode *  ASTCEncode
-     )
+      ASTC_Encode *  ASTCEncode,
+      compress_symbolic_block_buffers *buffers)
 {
       DEBUG("compress_symbolic_block");
       int i, j;
@@ -12043,10 +12044,10 @@ float compress_symbolic_block(
       endpoints_and_weights eix1[MAX_DECIMATION_MODES];
       endpoints_and_weights eix2[MAX_DECIMATION_MODES];
 
-      float   *decimated_weights                           = ASTCEncode->decimated_weights;
-      uint8_t *u8_quantized_decimated_quantized_weights    = ASTCEncode->u8_quantized_decimated_quantized_weights;
-      float   *decimated_quantized_weights                 = ASTCEncode->decimated_quantized_weights;
-      float   *flt_quantized_decimated_quantized_weights   = ASTCEncode->flt_quantized_decimated_quantized_weights;
+      float   *decimated_weights                           = buffers->decimated_weights;
+      uint8_t *u8_quantized_decimated_quantized_weights    = buffers->u8_quantized_decimated_quantized_weights;
+      float   *decimated_quantized_weights                 = buffers->decimated_quantized_weights;
+      float   *flt_quantized_decimated_quantized_weights   = buffers->flt_quantized_decimated_quantized_weights;
 
       if (blk->red_min == blk->red_max && blk->green_min == blk->green_max && blk->blue_min == blk->blue_max && blk->alpha_min == blk->alpha_max)
       {

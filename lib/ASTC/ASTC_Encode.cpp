@@ -30,14 +30,15 @@
 #include "ASTC_Host.h"
 
 void ASTCBlockEncoder::CompressBlock_kernel(astc_codec_image *input_image,
-	uint8_t *bp, int x, int y, ASTC_Encoder::ASTC_Encode *ASTCEncode)
+	uint8_t *bp, int x, int y, ASTC_Encoder::ASTC_Encode *ASTCEncode,
+	ASTC_Encoder::compress_symbolic_block_buffers *buffers)
 {
 	imageblock_cpu m_pb;
 	symbolic_compressed_block scb;
 
 	fetch_imageblock_cpu(input_image, &m_pb, x, y, 0, ASTCEncode);
 
-	ASTC_Encoder::compress_symbolic_block(&m_pb, &scb, ASTCEncode);
+	ASTC_Encoder::compress_symbolic_block(&m_pb, &scb, ASTCEncode, buffers);
 	physical_compressed_block pcb;
 	pcb = ASTC_Encoder::symbolic_to_physical(&scb, ASTCEncode);
 
