@@ -40,7 +40,8 @@
 #include <vector>
 #include <memory>
 
-CMP_BYTE CCodec_ASTC::sDefaultEncodeThreads = 4;
+CMP_BYTE CCodec_ASTC::sDefaultEncodeThreads =
+	CMP_BYTE(std::thread::hardware_concurrency());
 
 const astc_block_size_t ASTC_VALID_BLOCK_SIZE[ASTC_VALID_BLOCK] = {
 	{ 4, 4 }, //
