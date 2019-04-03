@@ -42,8 +42,4 @@ typedef std::uint8_t BYTE;
 #define ASTC_COMPRESSED_BLOCK_SIZE (ASTC_MIN_BLOCK_SIZE * ASTC_MIN_BLOCK_SIZE)
 #define ASTC_MAX_BLOCK_SIZE 12
 
-// ASTC Specification based data
-
-#define MAX_ASTC_THREADS 8
-
 #endif
