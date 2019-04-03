@@ -73,6 +73,7 @@ public:
 		CMP_DWORD dwHeight, CMP_DWORD dwPitch = 0, CMP_BYTE *pData = 0) const;
 
 private:
+	static CMP_BYTE sMaxEncodeThreads;
 	static CMP_BYTE sDefaultEncodeThreads;
 
 	CMP_WORD m_NumThreads;
