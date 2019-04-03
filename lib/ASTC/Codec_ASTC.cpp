@@ -39,9 +39,13 @@
 #include <thread>
 #include <vector>
 #include <memory>
+#include <queue>
 
-CMP_BYTE CCodec_ASTC::sDefaultEncodeThreads =
+#include <mutex>
+
+CMP_BYTE CCodec_ASTC::sMaxEncodeThreads =
 	CMP_BYTE(std::thread::hardware_concurrency());
+CMP_BYTE CCodec_ASTC::sDefaultEncodeThreads = sMaxEncodeThreads;
 
 const astc_block_size_t ASTC_VALID_BLOCK_SIZE[ASTC_VALID_BLOCK] = {
 	{ 4, 4 }, //
@@ -73,17 +77,31 @@ struct ASTCEncodeBlockData
 	void encode(ASTC_Encoder::ASTC_Encode *encoder);
 };
 
+struct ASTCEncodeQueue
+{
+	std::mutex blocksMutex;
+	std::queue<ASTCEncodeBlockData> blocks;
+
+	~ASTCEncodeQueue();
+
+	void start();
+
+private:
+	std::thread thread;
+	void work();
+};
+
 struct ASTCEncodeThread
 {
-	std::vector<ASTCEncodeBlockData> blocks;
-	ASTC_Encoder::compress_symbolic_block_buffers buffers;
-
-	ASTCEncodeThread(ASTC_Encoder::ASTC_Encode *encoder);
+	ASTCEncodeThread(
+		ASTCEncodeQueue *queue, ASTC_Encoder::ASTC_Encode *encoder);
 	~ASTCEncodeThread();
 
 	void start();
 
 private:
+	ASTC_Encoder::compress_symbolic_block_buffers buffers;
+	ASTCEncodeQueue *queue;
 	ASTC_Encoder::ASTC_Encode *encoder;
 	std::thread thread;
 	void work();
@@ -193,26 +211,27 @@ CodecError CCodec_ASTC::Compress(
 		// setup compression threads for each
 		// block to encode  we will load the buffer to pass to ASTC code as 8 bit 4x4 blocks
 		// the fill in source image. ASTC code will then use the adaptive sizes for process on the input
-		CMP_WORD numEncodingThreads =
-			MIN(m_NumThreads, CMP_WORD(MAX_ASTC_THREADS));
+		CMP_WORD numEncodingThreads = MIN(m_NumThreads, sMaxEncodeThreads);
 		if (numEncodingThreads == 0)
 			numEncodingThreads = 1;
+		std::unique_ptr<ASTCEncodeQueue> queue;
 		std::vector<std::unique_ptr<ASTCEncodeThread>> threads;
-		size_t blocksPerThread = 0;
 		std::unique_ptr<ASTC_Encoder::compress_symbolic_block_buffers> buffers;
 		if (numEncodingThreads > 1)
 		{
-			threads.reserve(numEncodingThreads);
-			blocksPerThread = (xblocks * yblocks + numEncodingThreads - 1) /
-				numEncodingThreads;
+			queue.reset(new ASTCEncodeQueue);
+			for (int i = 0; i < numEncodingThreads; i++)
+			{
+				threads.emplace_back(
+					new ASTCEncodeThread(queue.get(), encoder.get()));
+			}
 		} else
 		{
 			buffers.reset(new ASTC_Encoder::compress_symbolic_block_buffers);
 		}
 
-		size_t threadIndex = 0;
-		size_t counter = 0;
 		ASTCEncodeBlockData blockData;
+		blockData.buffers = buffers.get();
 		for (int y = 0; y < yblocks; y++)
 		{
 			int yoffset = y * xblocks;
@@ -228,33 +247,24 @@ CodecError CCodec_ASTC::Compress(
 
 				if (numEncodingThreads > 1)
 				{
-					if (counter == 0)
-					{
-						auto thread = new ASTCEncodeThread(encoder.get());
-						threads.emplace_back(thread);
-						thread->blocks.reserve(blocksPerThread);
-					}
-					auto thread = threads.at(threadIndex).get();
-					blockData.buffers = &thread->buffers;
-					thread->blocks.emplace_back(blockData);
-
-					if (++counter == blocksPerThread)
-					{
-						counter = 0;
-						threadIndex++;
-					}
+					queue->blocks.push(blockData);
 				} else
 				{
-					blockData.buffers = buffers.get();
 					blockData.encode(encoder.get());
 				}
 			}
 		}
 
-		for (auto &thread : threads)
+		if (numEncodingThreads > 1)
 		{
-			thread->start();
+			queue->start();
+			for (auto &thread : threads)
+			{
+				thread->start();
+			}
 		}
+
+		queue.reset();
 	} // all threads join here
 
 	destroy_image_cpu(input_image);
@@ -365,8 +375,10 @@ CCodecBuffer *CCodec_ASTC::CreateBuffer(CMP_BYTE nBlockWidth,
 	return buffer;
 }
 
-ASTCEncodeThread::ASTCEncodeThread(ASTC_Encoder::ASTC_Encode *encoder)
-	: encoder(encoder)
+ASTCEncodeThread::ASTCEncodeThread(
+	ASTCEncodeQueue *queue, ASTC_Encoder::ASTC_Encode *encoder)
+	: queue(queue)
+	, encoder(encoder)
 {
 }
 
@@ -378,17 +390,25 @@ ASTCEncodeThread::~ASTCEncodeThread()
 
 void ASTCEncodeThread::start()
 {
-	if (blocks.empty())
-		return;
-
 	assert(!thread.joinable());
 	thread = std::thread(&ASTCEncodeThread::work, this);
 }
 
 void ASTCEncodeThread::work()
 {
-	for (auto &block : blocks)
+	while (true)
 	{
+		ASTCEncodeBlockData block;
+		{
+			std::lock_guard<std::mutex> lock(queue->blocksMutex);
+			auto &blocks = queue->blocks;
+			if (blocks.empty())
+				break;
+			block = blocks.front();
+			blocks.pop();
+		}
+
+		block.buffers = &buffers;
 		block.encode(encoder);
 	}
 }
@@ -397,4 +417,29 @@ void ASTCEncodeBlockData::encode(ASTC_Encoder::ASTC_Encode *encoder)
 {
 	ASTCBlockEncoder::CompressBlock_kernel(
 		input_image, bp, x, y, encoder, buffers);
+}
+
+ASTCEncodeQueue::~ASTCEncodeQueue()
+{
+	if (thread.joinable())
+		thread.join();
+}
+
+void ASTCEncodeQueue::start()
+{
+	assert(!thread.joinable());
+	thread = std::thread(&ASTCEncodeQueue::work, this);
+}
+
+void ASTCEncodeQueue::work()
+{
+	while (true)
+	{
+		{
+			std::lock_guard<std::mutex> lock(blocksMutex);
+			if (blocks.empty())
+				break;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
 }
