@@ -77,18 +77,17 @@ struct ASTCEncodeBlockData
 	void encode(ASTC_Encoder::ASTC_Encode *encoder);
 };
 
+struct ASTCEncodeThread;
+
 struct ASTCEncodeQueue
 {
 	std::mutex blocksMutex;
 	std::queue<ASTCEncodeBlockData> blocks;
+	std::vector<std::unique_ptr<ASTCEncodeThread>> threads;
 
-	~ASTCEncodeQueue();
+	ASTCEncodeQueue(int threadCount, ASTC_Encoder::ASTC_Encode *encoder);
 
 	void start();
-
-private:
-	std::thread thread;
-	void work();
 };
 
 struct ASTCEncodeThread
@@ -100,9 +99,10 @@ struct ASTCEncodeThread
 	void start();
 
 private:
-	ASTC_Encoder::compress_symbolic_block_buffers buffers;
 	ASTCEncodeQueue *queue;
 	ASTC_Encoder::ASTC_Encode *encoder;
+	ASTC_Encoder::compress_symbolic_block_buffers buffers;
+
 	std::thread thread;
 	void work();
 };
@@ -215,16 +215,11 @@ CodecError CCodec_ASTC::Compress(
 		if (numEncodingThreads == 0)
 			numEncodingThreads = 1;
 		std::unique_ptr<ASTCEncodeQueue> queue;
-		std::vector<std::unique_ptr<ASTCEncodeThread>> threads;
 		std::unique_ptr<ASTC_Encoder::compress_symbolic_block_buffers> buffers;
 		if (numEncodingThreads > 1)
 		{
-			queue.reset(new ASTCEncodeQueue);
-			for (int i = 0; i < numEncodingThreads; i++)
-			{
-				threads.emplace_back(
-					new ASTCEncodeThread(queue.get(), encoder.get()));
-			}
+			queue.reset(new ASTCEncodeQueue(numEncodingThreads, encoder.get()));
+
 		} else
 		{
 			buffers.reset(new ASTC_Encoder::compress_symbolic_block_buffers);
@@ -258,13 +253,7 @@ CodecError CCodec_ASTC::Compress(
 		if (numEncodingThreads > 1)
 		{
 			queue->start();
-			for (auto &thread : threads)
-			{
-				thread->start();
-			}
 		}
-
-		queue.reset();
 	} // all threads join here
 
 	destroy_image_cpu(input_image);
@@ -419,20 +408,22 @@ void ASTCEncodeBlockData::encode(ASTC_Encoder::ASTC_Encode *encoder)
 		input_image, bp, x, y, encoder, buffers);
 }
 
-ASTCEncodeQueue::~ASTCEncodeQueue()
+ASTCEncodeQueue::ASTCEncodeQueue(
+	int threadCount, ASTC_Encoder::ASTC_Encode *encoder)
 {
-	if (thread.joinable())
-		thread.join();
+	threads.reserve(threadCount);
+	for (int i = 0; i < threadCount; i++)
+	{
+		threads.emplace_back(new ASTCEncodeThread(this, encoder));
+	}
 }
 
 void ASTCEncodeQueue::start()
 {
-	assert(!thread.joinable());
-	thread = std::thread(&ASTCEncodeQueue::work, this);
-}
-
-void ASTCEncodeQueue::work()
-{
+	for (auto &thread : threads)
+	{
+		thread->start();
+	}
 	while (true)
 	{
 		{

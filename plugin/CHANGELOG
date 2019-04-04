@@ -1,7 +1,7 @@
 ASTC image format plugin for Qt
 ===============================
 
-v1.0.1  03.04.2019
+v1.0.1  04.04.2019
     [REFINE] Maximize threads usage when encoding.
 
 v1.0.0  29.03.2019
