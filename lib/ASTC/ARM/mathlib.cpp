@@ -14,11 +14,11 @@
 /*----------------------------------------------------------------------------*/
 #include "mathlib.h"
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <ctime>
 #include <cstdlib>
 #include <cstdio>
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #if defined(WIN32) && (_MSC_VER <= 1700)
 double cbrt(double n)
