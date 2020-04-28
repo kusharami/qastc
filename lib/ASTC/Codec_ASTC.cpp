@@ -86,6 +86,7 @@ struct ASTCEncodeQueue
 	std::vector<std::unique_ptr<ASTCEncodeThread>> threads;
 
 	ASTCEncodeQueue(int threadCount, ASTC_Encoder::ASTC_Encode *encoder);
+	~ASTCEncodeQueue();
 
 	void start();
 };
@@ -416,6 +417,11 @@ ASTCEncodeQueue::ASTCEncodeQueue(
 	{
 		threads.emplace_back(new ASTCEncodeThread(this, encoder));
 	}
+}
+
+ASTCEncodeQueue::~ASTCEncodeQueue()
+{
+	threads.clear(); // join all threads before mutex destruction
 }
 
 void ASTCEncodeQueue::start()
