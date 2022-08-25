@@ -85,10 +85,9 @@ struct ASTCEncodeQueue
 	std::queue<ASTCEncodeBlockData> blocks;
 	std::vector<std::unique_ptr<ASTCEncodeThread>> threads;
 
-	ASTCEncodeQueue(int threadCount, ASTC_Encoder::ASTC_Encode *encoder);
 	~ASTCEncodeQueue();
 
-	void start();
+	void start(size_t maxThreadCount, ASTC_Encoder::ASTC_Encode *encoder);
 };
 
 struct ASTCEncodeThread
@@ -219,7 +218,7 @@ CodecError CCodec_ASTC::Compress(
 		std::unique_ptr<ASTC_Encoder::compress_symbolic_block_buffers> buffers;
 		if (numEncodingThreads > 1)
 		{
-			queue.reset(new ASTCEncodeQueue(numEncodingThreads, encoder.get()));
+			queue.reset(new ASTCEncodeQueue);
 
 		} else
 		{
@@ -253,7 +252,7 @@ CodecError CCodec_ASTC::Compress(
 
 		if (numEncodingThreads > 1)
 		{
-			queue->start();
+			queue->start(numEncodingThreads, encoder.get());
 		}
 	} // all threads join here
 
@@ -409,34 +408,23 @@ void ASTCEncodeBlockData::encode(ASTC_Encoder::ASTC_Encode *encoder)
 		input_image, bp, x, y, encoder, buffers);
 }
 
-ASTCEncodeQueue::ASTCEncodeQueue(
-	int threadCount, ASTC_Encoder::ASTC_Encode *encoder)
-{
-	threads.reserve(threadCount);
-	for (int i = 0; i < threadCount; i++)
-	{
-		threads.emplace_back(new ASTCEncodeThread(this, encoder));
-	}
-}
-
 ASTCEncodeQueue::~ASTCEncodeQueue()
 {
 	threads.clear(); // join all threads before mutex destruction
 }
 
-void ASTCEncodeQueue::start()
+void ASTCEncodeQueue::start(
+	size_t maxThreadCount, ASTC_Encoder::ASTC_Encode *encoder)
 {
+	size_t threadCount = std::min(maxThreadCount, blocks.size());
+	threads.clear();
+	threads.reserve(threadCount);
+	for (int i = 0; i < threadCount; i++)
+	{
+		threads.emplace_back(new ASTCEncodeThread(this, encoder));
+	}
 	for (auto &thread : threads)
 	{
 		thread->start();
-	}
-	while (true)
-	{
-		{
-			std::lock_guard<std::mutex> lock(blocksMutex);
-			if (blocks.empty())
-				break;
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }

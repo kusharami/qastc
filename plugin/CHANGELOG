@@ -1,6 +1,9 @@
 ASTC image format plugin for Qt
 ===============================
 
+v1.0.3  25.08.2022
+    [REFINE] Optimizations
+
 v1.0.2  28.04.2020
     [FIX] Do not destroy mutex before encode threads to prevent crash
 
